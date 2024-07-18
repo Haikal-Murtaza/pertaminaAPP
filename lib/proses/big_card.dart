@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
+// Widget that displays a word pair in a big card
 class BigCard extends StatelessWidget {
   const BigCard({
     Key? key,

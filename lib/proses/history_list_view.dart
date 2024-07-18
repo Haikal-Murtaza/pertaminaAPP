@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
 
+// Displays the history of generated word pairs
 class HistoryListView extends StatefulWidget {
   const HistoryListView({Key? key}) : super(key: key);
 
@@ -12,6 +13,7 @@ class HistoryListView extends StatefulWidget {
 class _HistoryListViewState extends State<HistoryListView> {
   final _key = GlobalKey();
 
+  // Gradient used to fade out the history items at the top
   static const Gradient _maskingGradient = LinearGradient(
     colors: [Colors.transparent, Colors.black],
     stops: [0.0, 0.5],

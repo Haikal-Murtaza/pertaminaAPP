@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'app_state.dart';
-import 'history_list_view.dart';
-import 'big_card.dart';
+import '../proses/app_state.dart';
+import '../proses/history_list_view.dart';
+import '../proses/big_card.dart';
 
+// Page that generates and displays word pairs
 class GeneratorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
