@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'proses/app_state.dart';
 import 'navbar.dart';
 
 // Entry point of the application
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // Provides MyAppState to the widget tree
     return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+      create: (context) {},
       child: MaterialApp(
         title: 'pertamina_app',
         theme: ThemeData(
