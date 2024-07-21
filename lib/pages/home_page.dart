@@ -5,7 +5,64 @@ import 'task_list_page.dart';
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    String today = DateFormat('MMMM dd, yyyy').format(DateTime.now());
+
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(200),
+        child: AppBar(
+          backgroundColor: Colors.blue,
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                // Row untuk logo
+                Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/logo.png'),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      width: 140,
+                      height: 70,
+                    ),
+                  ],
+                ),
+                // Row untuk username, date dan photo profile
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Welcome @username',
+                            style: TextStyle(fontSize: 18)),
+                        Text(today, style: TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                    SizedBox(width: 70), // spasi antara text dan photo
+                    Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/profile_picture.png'),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      width: 110,
+                      height: 120,
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
