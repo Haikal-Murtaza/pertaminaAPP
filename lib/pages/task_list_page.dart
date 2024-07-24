@@ -11,41 +11,14 @@ class TaskListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
+        preferredSize: Size.fromHeight(60),
         child: AppBar(
+          title: Text(
+            'Tugas Rutin dan Non Rutin ${month.isEmpty ? category : "bulan $month"}',
+            style: TextStyle(fontSize: 16),
+          ),
           backgroundColor:
               Colors.blue, // Set your desired background color here
-          flexibleSpace: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                // Row for logo and logout button
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(
-                              'assets/logo.png'), // Ensure this path is correct
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      width: 100,
-                      height: 40, // Adjusted height to ensure it fits well
-                    ),
-                    Spacer(),
-                    IconButton(
-                      icon: Icon(Icons.logout),
-                      onPressed: () {
-                        // Add your logout logic here
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
         ),
       ),
       body: Padding(
@@ -54,7 +27,7 @@ class TaskListPage extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            child: Table(
+            child: Table( 
               border: TableBorder
                   .all(), // Add this to get lines between rows and columns
               columnWidths: const {
@@ -73,7 +46,7 @@ class TaskListPage extends StatelessWidget {
                     TableCell(child: Center(child: Text('Name of Task'))),
                     TableCell(child: Center(child: Text('PIC'))),
                     TableCell(child: Center(child: Text('Frequency'))),
-                    if (!month.isEmpty)
+                    if (month.isNotEmpty)
                       TableCell(child: Center(child: Text('Month'))),
                     TableCell(child: Center(child: Text('Action'))),
                   ],
@@ -92,7 +65,7 @@ class TaskListPage extends StatelessWidget {
                       TableCell(
                           child:
                               Center(child: Text('Daily'))), // Dummy frequency
-                      if (!month.isEmpty)
+                      if (month.isNotEmpty)
                         TableCell(
                             child: Center(child: Text(month))), // Dummy month
                       TableCell(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pertamina_app/pages/about_page.dart';
+import 'package:pertamina_app/pages/admin_page.dart';
 import 'package:pertamina_app/pages/login_page.dart';
 import 'package:pertamina_app/pages/notification_page.dart';
 import 'package:pertamina_app/pages/privacy_page.dart';
@@ -75,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => PrivacyPage()),
+                      MaterialPageRoute(builder: (context) => AdminPage()),
                     );
                   },
                 ),
