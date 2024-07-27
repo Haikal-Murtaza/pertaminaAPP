@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "108647430467",
+    "project_id": "pertamina-4abd0",
+    "storage_bucket": "pertamina-4abd0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108647430467:android:605bf8c164b24268a417f6",
+        "android_client_info": {
+          "package_name": "com.pertamina_parta_niaga_lhokseumawe.pertamina_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBKQmz0onV4yg2urqzUrEfeJEAbD5CWQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

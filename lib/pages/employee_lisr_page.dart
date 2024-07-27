@@ -1,19 +1,4 @@
-import 'package:flutter/material.dart'
-    show
-        AppBar,
-        BuildContext,
-        EdgeInsets,
-        FloatingActionButton,
-        Icon,
-        Icons,
-        ListTile,
-        ListView,
-        Padding,
-        Scaffold,
-        State,
-        StatefulWidget,
-        Text,
-        Widget;
+import 'package:flutter/material.dart';
 
 class EmployeeListPage extends StatefulWidget {
   @override
@@ -23,7 +8,7 @@ class EmployeeListPage extends StatefulWidget {
 class _EmployeeListPageState extends State<EmployeeListPage> {
   var email = '';
 
-  void _getCustomer() {}
+  void _addEmployee() {}
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +28,7 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _getCustomer,
+        onPressed: _addEmployee,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
