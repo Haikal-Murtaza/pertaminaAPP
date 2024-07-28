@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pertamina_app/pages/about_page.dart';
-import 'package:pertamina_app/pages/admin_page.dart';
-import 'package:pertamina_app/pages/login_page.dart';
-import 'package:pertamina_app/pages/notification_page.dart';
-import 'package:pertamina_app/pages/privacy_page.dart';
+import 'package:pertamina_app/nav.dart';
 
 class ProfilePage extends StatelessWidget {
   final String name = 'John Doe';
@@ -63,41 +59,28 @@ class ProfilePage extends StatelessWidget {
                   leading: Icon(Icons.notifications),
                   title: Text('Notifications'),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NotificationsPage()),
-                    );
+                    navNotificationPage(context);
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.admin_panel_settings),
                   title: Text('Admin Menu'),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => AdminPage()),
-                    );
+                    navAdminPage(context);
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.lock),
                   title: Text('Privacy'),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PrivacyPage()),
-                    );
+                    navPrivacyPage(context);
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.info),
                   title: Text('About'),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => AboutPage()),
-                    );
+                    navAboutPage(context);
                   },
                 ),
                 Divider(),
@@ -105,10 +88,7 @@ class ProfilePage extends StatelessWidget {
                   leading: Icon(Icons.logout),
                   title: Text('Logout'),
                   onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
+                    navLogout(context);
                   },
                 ),
               ],

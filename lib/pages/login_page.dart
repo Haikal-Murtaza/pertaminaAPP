@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../navbar.dart'; // Ensure to import your main file or the file where MyHomePage is defined
+import '../bottomnavbar.dart'; // Ensure to import your main file or the file where MyHomePage is defined
 
 class LoginPage extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
