@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
       create: (context) {},
       child: MaterialApp(
         title: 'pertamina_app',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
