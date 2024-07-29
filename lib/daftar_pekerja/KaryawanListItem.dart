@@ -3,6 +3,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'authDataKaryawan.dart';
+
 class KaryawanListItem extends StatefulWidget {
   final DocumentSnapshot document;
 
@@ -56,6 +58,22 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      GestureDetector(
+                        onTap: () {
+                          showDeleteConfirmationDialog;
+                        },
+                        child: Container(
+                            height: 30,
+                            width: 30,
+                            decoration: BoxDecoration(
+                                color: Colors.orange.shade700,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                    bottomRight: Radius.circular(10))),
+                            child: Icon(Icons.delete_outline,
+                                color: Colors.white)),
+                      ),
                       Container(
                           height: 30,
                           width: 30,
@@ -65,8 +83,7 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                                   topLeft: Radius.circular(10),
                                   topRight: Radius.circular(10),
                                   bottomRight: Radius.circular(10))),
-                          child:
-                              Icon(Icons.delete_outline, color: Colors.white)),
+                          child: Icon(Icons.edit_square, color: Colors.white)),
                       Container(
                           height: 30,
                           width: 30,
@@ -76,19 +93,8 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                                   topLeft: Radius.circular(10),
                                   topRight: Radius.circular(10),
                                   bottomRight: Radius.circular(10))),
-                          child:
-                              Icon(Icons.delete_outline, color: Colors.white)),
-                      Container(
-                          height: 30,
-                          width: 30,
-                          decoration: BoxDecoration(
-                              color: Colors.orange.shade700,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                  bottomRight: Radius.circular(10))),
-                          child:
-                              Icon(Icons.delete_outline, color: Colors.white))
+                          child: Icon(Icons.library_books_outlined,
+                              color: Colors.white))
                     ],
                   ),
                 )
@@ -109,23 +115,5 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
         ],
       ),
     );
-    // return Container(
-    //   title: Text(
-    //     widget.document['nama_karyawan'],
-    //     style: TextStyle(fontSize: 16),
-    //   ),
-    //   subtitle: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.start,
-    //     children: [
-    //       Text(
-    //         '${widget.document['email_karyawan']}',
-    //         style: TextStyle(fontSize: 13),
-    //       ),
-    //       Divider(
-    //         color: Colors.black54,
-    //       )
-    //     ],
-    //   ),
-    // );
   }
 }

@@ -79,6 +79,19 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
                               SizedBox(width: 50)
                             ]))
                   ])),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                  onChanged: (value) {
+                    _onSearchChanged();
+                  },
+                ),
+              ),
               Expanded(child: KaryawanItem(searchQuery: searchQuery))
             ])),
         floatingActionButton: FloatingActionButton(

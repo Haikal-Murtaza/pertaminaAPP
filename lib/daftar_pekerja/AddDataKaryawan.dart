@@ -3,8 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../nav.dart';
-
 class AddDataKaryawanPage extends StatefulWidget {
   @override
   State<AddDataKaryawanPage> createState() => _AddDataKaryawanPageState();
@@ -159,7 +157,7 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
           content: Text('Registration successfully'),
           duration: Duration(seconds: 4),
         ));
-        navEmployeePage(context);
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Please enter valid data.'),
