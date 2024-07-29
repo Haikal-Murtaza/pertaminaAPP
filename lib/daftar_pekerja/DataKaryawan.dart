@@ -43,7 +43,7 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
             width: deviceWidth,
             child: Column(children: [
               Container(
-                  height: 170,
+                  height: 160,
                   decoration: BoxDecoration(
                       color: Colors.amber,
                       borderRadius: BorderRadius.only(

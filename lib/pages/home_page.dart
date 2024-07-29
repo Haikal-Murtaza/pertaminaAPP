@@ -17,21 +17,17 @@ class HomePage extends StatelessWidget {
             child: Column(
               children: [
                 // Row untuk logo
-                Row(
-                  children: [
-                    Container(
+                Row(children: [
+                  Container(
+                      margin: EdgeInsets.only(top: 15),
                       decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/logo.png'),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      width: 140,
-                      height: 70,
-                    ),
-                  ],
-                ),
+                          image: DecorationImage(
+                              image: AssetImage('assets/logo.png'),
+                              fit: BoxFit.fitHeight),
+                          borderRadius: BorderRadius.circular(4.0)),
+                      width: 230,
+                      height: 50)
+                ]),
                 // Row untuk username, date dan photo profile
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

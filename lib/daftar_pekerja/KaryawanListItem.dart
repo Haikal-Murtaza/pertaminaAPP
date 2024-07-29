@@ -26,29 +26,86 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: Alignment.center,
-      margin: EdgeInsets.symmetric(horizontal: 25),
+      margin: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
       height: 170,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(15)),
           color: Color.fromARGB(255, 217, 217, 217)),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
             padding: EdgeInsets.only(left: 10),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   widget.document['nama_karyawan'],
                   style: TextStyle(fontSize: 16),
                 ),
                 Text(
-                  widget.document['nama_karyawan'],
+                  widget.document['nip_karyawan'],
                   style: TextStyle(fontSize: 16),
                 ),
+                Text(widget.document['jabatan_karyawan'],
+                    style: TextStyle(fontSize: 16)),
+                SizedBox(height: 10),
+                Container(
+                  width: 120,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                              color: Colors.orange.shade700,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10))),
+                          child:
+                              Icon(Icons.delete_outline, color: Colors.white)),
+                      Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                              color: Colors.orange.shade700,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10))),
+                          child:
+                              Icon(Icons.delete_outline, color: Colors.white)),
+                      Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                              color: Colors.orange.shade700,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10))),
+                          child:
+                              Icon(Icons.delete_outline, color: Colors.white))
+                    ],
+                  ),
+                )
               ],
             ),
-          )
+          ),
+          Container(
+              margin: EdgeInsets.only(right: 15),
+              height: 130,
+              width: 130,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.green),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset('assets/profile_picture.png',
+                      fit: BoxFit.fitHeight, height: 90, width: 160)))
         ],
       ),
     );
