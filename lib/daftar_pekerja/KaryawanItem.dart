@@ -1,19 +1,21 @@
+// ignore_for_file: file_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'stok_listitem.dart';
+import 'KaryawanListItem.dart';
 
-class StockList extends StatelessWidget {
+class KaryawanItem extends StatelessWidget {
   final String searchQuery;
 
-  const StockList({required this.searchQuery});
+  const KaryawanItem({required this.searchQuery});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('data')
-          .orderBy('namabarang')
+          .collection('data_karyawan')
+          .orderBy('nama_karyawan')
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -25,20 +27,20 @@ class StockList extends StatelessWidget {
             child: Text('Error: ${snapshot.error}'),
           );
         } else {
-          List<DocumentSnapshot> stockItems = snapshot.data!.docs;
+          List<DocumentSnapshot> karyawanItems = snapshot.data!.docs;
           if (searchQuery.isNotEmpty) {
-            stockItems = stockItems.where((doc) {
-              return doc['namabarang']
+            karyawanItems = karyawanItems.where((doc) {
+              return doc['nama_karyawan']
                   .toString()
                   .toLowerCase()
                   .contains(searchQuery.toLowerCase());
             }).toList();
           }
           return ListView.builder(
-            itemCount: stockItems.length,
+            itemCount: karyawanItems.length,
             itemBuilder: (context, index) {
-              DocumentSnapshot document = stockItems[index];
-              return StockListItem(document: document);
+              DocumentSnapshot document = karyawanItems[index];
+              return KaryawanListItem(document: document);
             },
           );
         }

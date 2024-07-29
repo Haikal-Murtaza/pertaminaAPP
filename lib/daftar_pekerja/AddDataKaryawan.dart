@@ -1,36 +1,42 @@
+// ignore_for_file: use_build_context_synchronously, file_names
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../nav.dart';
 
-class AddStockPage extends StatelessWidget {
-  final TextEditingController namabrg = TextEditingController();
-  final TextEditingController jumlahbrg = TextEditingController();
+class AddDataKaryawanPage extends StatefulWidget {
+  @override
+  State<AddDataKaryawanPage> createState() => _AddDataKaryawanPageState();
+}
+
+class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
+  final TextEditingController namakaryawan = TextEditingController();
+  final TextEditingController nipkaryawan = TextEditingController();
+  final TextEditingController emailkaryawan = TextEditingController();
+  final TextEditingController jabatankaryawan = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
-    double setWidth = deviceWidth * 0.59;
+    double setWidth = deviceWidth * 0.55;
 
     return Scaffold(
-        appBar: AppBar(
-            foregroundColor: Colors.white,
-            title: Text('Add Stock Barang'),
-            centerTitle: true),
+        appBar: AppBar(title: Text('Tambah Data Karyawan')),
         body: Container(
-          alignment: Alignment.topLeft,
-          margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          height: 350,
-          width: double.infinity,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              boxShadow: [
-                BoxShadow(spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
-              ]),
-          child: Column(
-            children: [
+            alignment: Alignment.topLeft,
+            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            height: 500,
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                      spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
+                ]),
+            child: Column(children: [
               Row(children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,18 +44,36 @@ class AddStockPage extends StatelessWidget {
                     Container(
                         height: 60,
                         alignment: Alignment.centerLeft,
-                        child: Text('Nama Barang',
+                        child: Text('Nama karyawan',
+                            style: TextStyle(fontSize: 15))),
+                    Container(
+                        height: 60,
+                        alignment: Alignment.centerLeft,
+                        child: Text('NIP karyawan',
                             style: TextStyle(fontSize: 15))),
                     Container(
                         height: 60,
                         alignment: Alignment.centerLeft,
                         child: Text('Email Karyawan',
                             style: TextStyle(fontSize: 15))),
+                    Container(
+                        height: 60,
+                        alignment: Alignment.centerLeft,
+                        child: Text('Jabatan/Bagian',
+                            style: TextStyle(fontSize: 15))),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Container(
+                        height: 60,
+                        alignment: Alignment.centerLeft,
+                        child: Text(' :  ', style: TextStyle(fontSize: 15))),
+                    Container(
+                        height: 60,
+                        alignment: Alignment.centerLeft,
+                        child: Text(' :  ', style: TextStyle(fontSize: 15))),
                     Container(
                         height: 60,
                         alignment: Alignment.centerLeft,
@@ -65,7 +89,7 @@ class AddStockPage extends StatelessWidget {
                       height: 60,
                       width: setWidth,
                       child: TextFormField(
-                        controller: namabrg,
+                        controller: namakaryawan,
                         textAlignVertical: TextAlignVertical.bottom,
                         style: TextStyle(fontSize: 16),
                       )),
@@ -73,7 +97,23 @@ class AddStockPage extends StatelessWidget {
                       height: 60,
                       width: setWidth,
                       child: TextFormField(
-                        controller: jumlahbrg,
+                        controller: nipkaryawan,
+                        textAlignVertical: TextAlignVertical.bottom,
+                        style: TextStyle(fontSize: 16),
+                      )),
+                  SizedBox(
+                      height: 60,
+                      width: setWidth,
+                      child: TextFormField(
+                        controller: emailkaryawan,
+                        textAlignVertical: TextAlignVertical.bottom,
+                        style: TextStyle(fontSize: 16),
+                      )),
+                  SizedBox(
+                      height: 60,
+                      width: setWidth,
+                      child: TextFormField(
+                        controller: jabatankaryawan,
                         textAlignVertical: TextAlignVertical.bottom,
                         style: TextStyle(fontSize: 16),
                       )),
@@ -98,20 +138,22 @@ class AddStockPage extends StatelessWidget {
                                   fontSize: 19,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white)))))
-            ],
-          ),
-        ));
+            ])));
   }
 
   void _addStock(BuildContext context) async {
     try {
-      String nama = namabrg.text.trim();
-      String quantity = jumlahbrg.text.trim();
+      String nama = namakaryawan.text.trim();
+      String nip = nipkaryawan.text.trim();
+      String email = emailkaryawan.text.trim();
+      String jabatan = jabatankaryawan.text.trim();
 
       if (nama.isNotEmpty) {
-        await FirebaseFirestore.instance.collection('data').add({
-          'namabarang': nama,
-          'jumlahstok': quantity,
+        await FirebaseFirestore.instance.collection('data_karyawan').add({
+          'nama_karyawan': nama,
+          'nip_karyawan': nip,
+          'email_karyawan': email,
+          'jabatan_karyawan': jabatan,
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Registration successfully'),

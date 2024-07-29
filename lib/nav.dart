@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:pertamina_app/pages/about_page.dart';
-import 'package:pertamina_app/pages/admin_page.dart';
-import 'package:pertamina_app/pages/completed_task_list_page.dart';
-import 'package:pertamina_app/pages/login_page.dart';
-import 'package:pertamina_app/pages/notification_page.dart';
-import 'package:pertamina_app/pages/privacy_page.dart';
 
-import 'stokBarang/stok_add.dart';
-import 'stokBarang/stokbrg.dart';
+import 'daftar_pekerja/AddDataKaryawan.dart';
+import 'daftar_pekerja/DataKaryawan.dart';
+import 'pages/about_page.dart';
+import 'pages/admin_page.dart';
+import 'pages/completed_task_list_page.dart';
+import 'pages/login_page.dart';
+import 'pages/notification_page.dart';
+import 'pages/privacy_page.dart';
 
 // navigation profile page
 void navNotificationPage(BuildContext context) {
@@ -33,7 +33,6 @@ void navLogout(BuildContext context) {
       context, MaterialPageRoute(builder: (context) => LoginPage()));
 }
 
-// navigation admin page
 void navCompletedTaskPage(BuildContext context) {
   Navigator.push(context,
       MaterialPageRoute(builder: (context) => CompletedTaskListPage()));
@@ -41,10 +40,10 @@ void navCompletedTaskPage(BuildContext context) {
 
 void navEmployeePage(BuildContext context) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => StockListPage()));
+      context, MaterialPageRoute(builder: (context) => KaryawanListPage()));
 }
 
 void navToAdd(BuildContext context) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => AddStockPage()));
+      context, MaterialPageRoute(builder: (context) => AddDataKaryawanPage()));
 }
