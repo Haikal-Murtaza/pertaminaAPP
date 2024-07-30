@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../nav.dart';
-import 'KaryawanItem.dart';
+import 'datakaryawan_item.dart';
 
 class KaryawanListPage extends StatefulWidget {
   @override

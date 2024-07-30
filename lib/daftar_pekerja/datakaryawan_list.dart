@@ -3,7 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'authDataKaryawan.dart';
+import 'datakaryawan_auth.dart';
 
 class KaryawanListItem extends StatefulWidget {
   final DocumentSnapshot document;

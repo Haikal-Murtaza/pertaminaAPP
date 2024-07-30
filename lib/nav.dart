@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'daftar_pekerja/AddDataKaryawan.dart';
-import 'daftar_pekerja/DataKaryawan.dart';
+import 'daftar_pekerja/datakaryawan_add.dart';
+import 'daftar_pekerja/datakaryawan_page.dart';
 import 'pages/about_page.dart';
 import 'pages/admin_page.dart';
 import 'pages/completed_task_list_page.dart';
