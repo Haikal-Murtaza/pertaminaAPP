@@ -4,9 +4,9 @@ import 'daftar_pekerja/datakaryawan_page.dart';
 import 'pages/about_page.dart';
 import 'pages/admin_page.dart';
 import 'pages/completed_task_list_page.dart';
-import 'pages/login_page.dart';
 import 'pages/notification_page.dart';
 import 'pages/privacy_page.dart';
+import 'user_account/login_page.dart';
 
 // navigation profile page
 void navNotificationPage(BuildContext context) {
@@ -46,3 +46,5 @@ void navToAdd(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => AddDataKaryawanPage()));
 }
+
+Color maroon = Colors.red.shade900;
