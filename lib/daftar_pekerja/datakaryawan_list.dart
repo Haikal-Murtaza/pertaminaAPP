@@ -1,9 +1,7 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
+// ignore_for_file: file_names, library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import 'datakaryawan_auth.dart';
 
 class KaryawanListItem extends StatefulWidget {
   final DocumentSnapshot document;
@@ -22,6 +20,10 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void deleteUser(DocumentSnapshot document) {
+    deleteDataKaryawan(document);
   }
 
   @override
@@ -58,7 +60,8 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                             children: [
                               GestureDetector(
                                   onTap: () {
-                                    showDeleteConfirmationDialog;
+                                    showDeleteConfirmationDialog(
+                                        context, widget.document);
                                   },
                                   child: Container(
                                       height: 30,
@@ -108,5 +111,47 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                   child: Image.asset('assets/profile_picture.png',
                       fit: BoxFit.fitHeight, height: 90, width: 160)))
         ]));
+  }
+
+  void showDeleteConfirmationDialog(
+      BuildContext context, DocumentSnapshot document) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text("Konfirmasi"),
+              content: const Text("Apakah anda ingin menghapus data ini ?"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Batal")),
+                TextButton(
+                    onPressed: () {
+                      deleteDataKaryawan(document);
+                      Navigator.pop(context);
+                      showDeleteSuccessNotification(context);
+                    },
+                    child: const Text("Hapus"))
+              ]);
+        });
+  }
+
+  void showDeleteSuccessNotification(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Data berhasil dihapus!"),
+        backgroundColor: Color.fromARGB(255, 255, 17, 0),
+        
+        duration: Duration(seconds: 3)));
+  }
+
+  void deleteDataKaryawan(DocumentSnapshot document) async {
+    try {
+      await document.reference.delete();
+      print("Deleted");
+    } catch (e) {
+      print("Error deleting: $e");
+    }
   }
 }

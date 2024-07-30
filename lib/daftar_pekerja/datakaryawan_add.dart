@@ -154,13 +154,14 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
           'jabatan_karyawan': jabatan,
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Registration successfully'),
+          content: Text('Data Karyawan berhasil ditambahkan!'),
+          backgroundColor: Colors.green,
           duration: Duration(seconds: 4),
         ));
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Please enter valid data.'),
+          content: Text('Mohon masukkan data yang benar!'),
           duration: Duration(seconds: 2),
         ));
       }
