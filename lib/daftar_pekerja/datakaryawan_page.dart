@@ -1,5 +1,3 @@
-// ignore_for_file: unused_element, sized_box_for_whitespace, file_names
-
 import 'package:flutter/material.dart';
 
 import '../nav.dart';
