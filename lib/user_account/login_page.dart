@@ -1,8 +1,9 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
+import 'package:pertamina_app/nav.dart';
+import 'dart:convert';
 import '../bottomnavbar.dart';
-import '../nav.dart'; // Ensure to import your main file or the file where MyHomePage is defined
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,8 +13,67 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   bool _isObsure = true;
+
+  Future<void> _login() async {
+    String username = usernameController.text;
+    String password = passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      _showErrorDialog('Tolong isi username dan password');
+      return;
+    }
+
+    try {
+      QuerySnapshot userQuery = await FirebaseFirestore.instance
+          .collection('data_karyawan')
+          .where('username', isEqualTo: username)
+          .get();
+
+      if (userQuery.docs.isEmpty) {
+        _showErrorDialog('User not found');
+        return;
+      }
+
+      var userData = userQuery.docs.first.data() as Map<String, dynamic>;
+      String storedHashedPassword = userData['password'];
+
+      if (_hashPassword(password) == storedHashedPassword) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => NavBar()),
+        );
+      } else {
+        _showErrorDialog('Password tidak sesuai');
+      }
+    } catch (e) {
+      _showErrorDialog('An error occurred: $e');
+    }
+  }
+
+  String _hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,13 +187,7 @@ class _LoginPageState extends State<LoginPage> {
             width: 300,
             height: 55,
             child: ElevatedButton(
-                onPressed: () {
-                  if (usernameController.text.isNotEmpty &&
-                      passwordController.text.isNotEmpty) {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => NavBar()));
-                  }
-                },
+                onPressed: _login,
                 style: ButtonStyle(
                     shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                         RoundedRectangleBorder(

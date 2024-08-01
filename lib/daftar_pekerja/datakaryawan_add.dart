@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 class AddDataKaryawanPage extends StatefulWidget {
   @override
@@ -128,7 +130,7 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
                       border: Border.all(color: Colors.grey.shade700)),
                   child: GestureDetector(
                       onTap: () {
-                        _addStock(context);
+                        _addKaryawan(context);
                       },
                       child: Center(
                           child: Text('Add',
@@ -139,7 +141,7 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
             ])));
   }
 
-  void _addStock(BuildContext context) async {
+  void _addKaryawan(BuildContext context) async {
     try {
       String nama = namakaryawan.text.trim();
       String nip = nipkaryawan.text.trim();
@@ -152,6 +154,7 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
           'nip_karyawan': nip,
           'email_karyawan': email,
           'jabatan_karyawan': jabatan,
+          'password': hashPassword('pertamina'),
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Data Karyawan berhasil ditambahkan!'),
@@ -173,4 +176,10 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
       ));
     }
   }
+}
+
+String hashPassword(String password) {
+  final bytes = utf8.encode(password); // Convert password to bytes
+  final digest = sha256.convert(bytes); // Hash the password
+  return digest.toString(); // Return the hashed password as a string
 }

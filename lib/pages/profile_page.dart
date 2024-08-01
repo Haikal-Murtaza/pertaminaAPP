@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pertamina_app/nav.dart';
 
 class ProfilePage extends StatelessWidget {
-  final String name = 'John Doe';
-  final String employeeNumber = '123456';
+  final String name = 'Haikal Murtaza';
+  final String employeeNumber = '2021573010031';
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Employee No: $employeeNumber',
+                          'No ID: $employeeNumber',
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 16,

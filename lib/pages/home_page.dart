@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'task_list_page.dart';
+import '../daftar_tugas/task_list_page.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -35,22 +35,24 @@ class HomePage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Welcome @username',
+                        Text('Welcome @Haikal Murtaza',
                             style: TextStyle(fontSize: 18)),
                         Text(today, style: TextStyle(fontSize: 14)),
                       ],
                     ),
-                    SizedBox(width: 70), // spasi antara text dan photo
-                    Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/profile_picture.png'),
-                          fit: BoxFit.cover,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/profile_picture.png'),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        borderRadius: BorderRadius.circular(8.0),
+                        width: 110,
+                        height: 120,
                       ),
-                      width: 110,
-                      height: 120,
                     ),
                   ],
                 )
@@ -68,7 +70,7 @@ class HomePage extends StatelessWidget {
               // Title for Section 1
               Padding(
                 padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: Text('Task Based Categories',
+                child: Text('Daftar Kategori Tugas',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
@@ -91,7 +93,7 @@ class HomePage extends StatelessWidget {
               // Title for Section 2
               Padding(
                 padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: Text('Task Based Months',
+                child: Text('Daftar Tugas Bulan',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),

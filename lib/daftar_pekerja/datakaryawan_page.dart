@@ -98,7 +98,7 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
             onPressed: () {
               navToAdd(context);
             },
-            tooltip: 'Add Employee',
+            tooltip: 'tambah pekerja',
             child: Icon(Icons.add)));
   }
 }
