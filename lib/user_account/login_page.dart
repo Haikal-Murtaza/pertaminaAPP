@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
+import 'package:pertamina_app/bottomnavbar.dart';
 import 'package:pertamina_app/nav.dart';
 import 'dart:convert';
-import '../bottomnavbar.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -39,9 +39,13 @@ class _LoginPageState extends State<LoginPage> {
       String storedHashedPassword = userData['password'];
 
       if (_hashPassword(password) == storedHashedPassword) {
+        String name = userData['name'];
+        String level = userData['level'];
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => NavBar()),
+          MaterialPageRoute(
+            builder: (context) => NavBar(name: name, level: level),
+          ),
         );
       } else {
         _showErrorDialog('Password tidak sesuai');

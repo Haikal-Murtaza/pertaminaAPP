@@ -30,4 +30,3 @@ flutter:
   uses-material-design: true
   assets:
   - assets/logo.png
-  - assets/profile_picture.png

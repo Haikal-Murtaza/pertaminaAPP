@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../daftar_tugas/task_list_page.dart';
+import 'package:pertamina_app/daftar_tugas/task_list_page.dart';
 
 class HomePage extends StatelessWidget {
+  final String name;
+
+  HomePage({required this.name});
+
   @override
   Widget build(BuildContext context) {
     String today = DateFormat('MMMM dd, yyyy').format(DateTime.now());
@@ -16,46 +20,57 @@ class HomePage extends StatelessWidget {
             padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
-                // Row untuk logo
-                Row(children: [
-                  Container(
+                // Row for logo
+                Row(
+                  children: [
+                    Container(
                       margin: EdgeInsets.only(top: 15),
                       decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage('assets/logo.png'),
-                              fit: BoxFit.fitHeight),
-                          borderRadius: BorderRadius.circular(4.0)),
+                        image: DecorationImage(
+                          image: AssetImage('assets/logo.png'),
+                          fit: BoxFit.fitHeight,
+                        ),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
                       width: 230,
-                      height: 50)
-                ]),
-                // Row untuk username, date dan photo profile
+                      height: 50,
+                    ),
+                  ],
+                ),
+                // Row for username, date, and profile picture
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Welcome @Haikal Murtaza',
-                            style: TextStyle(fontSize: 18)),
+                        Container(
+                          constraints: BoxConstraints(maxWidth: 150),
+                          child: Text(
+                            'Welcome $name',
+                            style: TextStyle(fontSize: 18),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                         Text(today, style: TextStyle(fontSize: 14)),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/profile_picture.png'),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        width: 110,
-                        height: 120,
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(8.0),
+                    //   child: Container(
+                    //     decoration: BoxDecoration(
+                    //       // image: DecorationImage(
+                    //         // image: AssetImage('assets/profile_picture.png'),
+                    //         fit: BoxFit.cover,
+                    //       ),
+                    //       borderRadius: BorderRadius.circular(8.0),
+                    //     ),
+                    //     width: 110,
+                    //     height: 120,
+                    //   ),
+                    // ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -70,9 +85,10 @@ class HomePage extends StatelessWidget {
               // Title for Section 1
               Padding(
                 padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: Text('Daftar Kategori Tugas',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Daftar Kategori Tugas',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
               // Section 1
               Row(
@@ -93,9 +109,10 @@ class HomePage extends StatelessWidget {
               // Title for Section 2
               Padding(
                 padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: Text('Daftar Tugas Bulan',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Daftar Tugas Bulan',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
               // Section 2
               GridView.count(
@@ -136,7 +153,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Fungsi membuat card category tugas
+  // Function to create category task card
   Widget _buildCard(BuildContext context, String name, int tasks, Color color) {
     double progress = tasks / 20; // Dummy progress value
     return Expanded(

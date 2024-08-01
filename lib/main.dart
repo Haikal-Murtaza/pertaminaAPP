@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:pertamina_app/bottomnavbar.dart';
+import 'package:pertamina_app/user_account/login_page.dart';
 import 'package:provider/provider.dart';
 
 // import 'user_account/login_page.dart';
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
               seedColor: Color.fromARGB(255, 230, 120, 87)),
         ),
-        home: NavBar(),
+        home: LoginPage(),
       ),
     );
   }

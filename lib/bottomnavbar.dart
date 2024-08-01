@@ -1,11 +1,14 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:pertamina_app/pages/attendance_page.dart';
 import 'package:pertamina_app/pages/home_page.dart';
 import 'package:pertamina_app/pages/profile_page.dart';
 
 class NavBar extends StatefulWidget {
+  final String name;
+  final String level;
+
+  NavBar({required this.name, required this.level});
+
   @override
   _NavBarState createState() => _NavBarState();
 }
@@ -13,21 +16,21 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   int _selectedIndex = 0;
 
-  // list bottom bar pages
-  final List<Widget> _pages = [
-    HomePage(),
-    AttendancePage(),
-    ProfilePage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    // list bottom bar pages
+    final List<Widget> _pages = [
+      HomePage(name: widget.name),
+      AttendancePage(),
+      ProfilePage(),
+    ];
+
+    void _onItemTapped(int index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
