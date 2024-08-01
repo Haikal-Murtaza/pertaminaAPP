@@ -42,8 +42,8 @@ class _LoginPageState extends State<LoginPage> {
         String name = userData['name'];
         String level = userData['level'];
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
+            context,
+            MaterialPageRoute(
             builder: (context) => NavBar(name: name, level: level),
           ),
         );
@@ -63,20 +63,17 @@ class _LoginPageState extends State<LoginPage> {
 
   void _showErrorDialog(String message) {
     showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              title: Text('Error'),
+              content: Text(message),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('OK'))
+              ]);
+        });
   }
 
   @override
@@ -113,31 +110,27 @@ class _LoginPageState extends State<LoginPage> {
                 ],
                 borderRadius: BorderRadius.all(Radius.circular(25))),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  width: 250,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: TextFormField(
-                        controller: usernameController,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Colors.black,
-                            hintText: 'Username',
-                            hintStyle: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 15,
-                                color: Colors.black))),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Icon(Icons.account_circle_outlined,
-                      size: 35, weight: 0.5),
-                )
-              ],
-            )),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                      width: 250,
+                      child: Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: TextFormField(
+                              controller: usernameController,
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  fillColor: Colors.black,
+                                  hintText: 'Username',
+                                  hintStyle: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 15,
+                                      color: Colors.black))))),
+                  Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Icon(Icons.account_circle_outlined,
+                          size: 35, weight: 0.5))
+                ])),
         SizedBox(height: 20),
         // Password input box
         Container(
