@@ -36,7 +36,7 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
     double deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-        body: Container(
+        body: SizedBox(
             height: deviceHeight,
             width: deviceWidth,
             child: Column(children: [
@@ -55,7 +55,6 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Image.asset('assets/logo.png', width: 150),
-                              Icon(Icons.account_circle_outlined, size: 50)
                             ])),
                     Padding(
                         padding:
