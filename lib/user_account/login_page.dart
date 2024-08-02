@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
       String storedHashedPassword = userData['password'];
 
       if (_hashPassword(password) == storedHashedPassword) {
-        String name = userData['name'];
+        String name = userData['nama_karyawan'];
         String level = userData['level'];
         Navigator.pushReplacement(
           context,

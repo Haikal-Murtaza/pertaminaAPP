@@ -22,10 +22,6 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
     super.dispose();
   }
 
-  void deleteUser(DocumentSnapshot document) {
-    deleteDataKaryawan(document);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -108,7 +104,7 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                   color: Colors.green),
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.asset('assets/profile_picture.png',
+                  child: Image.asset('assets/default_profile_picture.png',
                       fit: BoxFit.fitHeight, height: 90, width: 160)))
         ]));
   }
@@ -142,7 +138,6 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Data berhasil dihapus!"),
         backgroundColor: Color.fromARGB(255, 255, 17, 0),
-        
         duration: Duration(seconds: 3)));
   }
 

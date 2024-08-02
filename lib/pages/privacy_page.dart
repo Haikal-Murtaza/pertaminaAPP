@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 
 class PrivacyPage extends StatefulWidget {
@@ -79,7 +78,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                   radius: 50,
                   backgroundImage: _image != null
                       ? FileImage(_image!)
-                      : AssetImage('assets/default_profile.png')
+                      : AssetImage('assets/default_profile_picture.png')
                           as ImageProvider,
                 ),
               ),

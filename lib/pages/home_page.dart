@@ -39,7 +39,7 @@ class HomePage extends StatelessWidget {
                 ),
                 // Row for username, date, and profile picture
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,20 +55,21 @@ class HomePage extends StatelessWidget {
                         Text(today, style: TextStyle(fontSize: 14)),
                       ],
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.all(8.0),
-                    //   child: Container(
-                    //     decoration: BoxDecoration(
-                    //       // image: DecorationImage(
-                    //         // image: AssetImage('assets/profile_picture.png'),
-                    //         fit: BoxFit.cover,
-                    //       ),
-                    //       borderRadius: BorderRadius.circular(8.0),
-                    //     ),
-                    //     width: 110,
-                    //     height: 120,
-                    //   ),
-                    // ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                                'assets/default_profile_picture.png'),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        width: 110,
+                        height: 120,
+                      ),
+                    ),
                   ],
                 ),
               ],

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:pertamina_app/user_account/login_page.dart';
 import 'package:provider/provider.dart';
 
-// import 'user_account/login_page.dart';
-
 // Entry point of the application
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
