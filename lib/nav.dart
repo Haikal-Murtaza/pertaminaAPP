@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:pertamina_app/daftar_tugas/datatugas_add.dart';
 import 'daftar_pekerja/datakaryawan_add.dart';
 import 'daftar_pekerja/datakaryawan_page.dart';
 import 'pages/about_page.dart';
@@ -46,6 +49,11 @@ void navEmployeePage(BuildContext context) {
 void navToAdd(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => AddDataKaryawanPage()));
+}
+
+void navToAddTask(BuildContext context) {
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => AddDataTugasPage()));
 }
 
 Color maroon = Colors.red.shade900;
