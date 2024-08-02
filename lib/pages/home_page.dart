@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pertamina_app/daftar_tugas/task_list_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   final String name;
 
   HomePage({required this.name});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     String today = DateFormat('MMMM dd, yyyy').format(DateTime.now());
@@ -47,7 +52,7 @@ class HomePage extends StatelessWidget {
                         Container(
                           constraints: BoxConstraints(maxWidth: 150),
                           child: Text(
-                            'Welcome $name',
+                            'Welcome ${widget.name}',
                             style: TextStyle(fontSize: 18),
                             overflow: TextOverflow.ellipsis,
                           ),
