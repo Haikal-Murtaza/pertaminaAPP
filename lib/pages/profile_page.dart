@@ -10,58 +10,48 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Stack(
-            children: [
-              Container(
-                height: 200,
-                color: Color.fromARGB(255, 72, 193, 79),
-              ),
-              Positioned(
+          Stack(children: [
+            Container(height: 200, color: Color.fromARGB(255, 72, 193, 79)),
+            Positioned(
                 left: 16,
                 bottom: 16,
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                        radius: 40,
-                        backgroundImage:
-                            AssetImage('assets/default_profile_picture.png')),
-                    SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'No ID: $employeeNumber',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                          radius: 40,
+                          backgroundImage:
+                              AssetImage('assets/default_profile_picture.png')),
+                      SizedBox(width: 16),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(name,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold)),
+                            Text('No ID: $employeeNumber',
+                                style: TextStyle(
+                                    color: Colors.white70, fontSize: 16))
+                          ])
+                    ]))
+          ]),
           Expanded(
             child: ListView(
               children: [
                 ListTile(
-                  leading: Icon(Icons.notifications),
-                  title: Text('Notifications'),
-                  onTap: () {
-                    navNotificationPage(context);
-                  },
-                ),
+                    leading: Icon(Icons.person),
+                    title: Text('Profile'),
+                    onTap: () {
+                      navToProfileUi(context);
+                    }),
+                ListTile(
+                    leading: Icon(Icons.notifications),
+                    title: Text('Notifications'),
+                    onTap: () {
+                      navNotificationPage(context);
+                    }),
                 ListTile(
                   leading: Icon(Icons.admin_panel_settings),
                   title: Text('Admin Menu'),

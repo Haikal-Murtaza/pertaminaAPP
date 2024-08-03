@@ -1,14 +1,15 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:pertamina_app/daftar_tugas/datatugas_add.dart';
 import 'daftar_pekerja/datakaryawan_add.dart';
 import 'daftar_pekerja/datakaryawan_page.dart';
+import 'daftar_tugas/datatugas_add.dart';
 import 'pages/about_page.dart';
 import 'pages/admin_page.dart';
 import 'daftar_tugas/completed_task_list_page.dart';
 import 'pages/notification_page.dart';
 import 'pages/privacy_page.dart';
+import 'profil/profile.dart';
 import 'user_account/login_page.dart';
 
 // navigation profile page
@@ -54,6 +55,10 @@ void navToAdd(BuildContext context) {
 void navToAddTask(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => AddDataTugasPage()));
+}
+
+void navToProfileUi(BuildContext context) {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileUi()));
 }
 
 Color maroon = Colors.red.shade900;
