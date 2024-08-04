@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pertamina_app/nav.dart';
-import 'datatugas_item.dart';
 
 class TugasListPage extends StatefulWidget {
   final String category;
@@ -107,9 +107,39 @@ class _TaskListPage extends State<TugasListPage> {
               ),
             ),
             Expanded(
-                child: TugasItem(
-                    searchQuery: searchQuery,
-                    month: widget.month)), // Pass month here
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('data_tugas')
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  final filteredDocuments =
+                      snapshot.data!.docs.where((document) {
+                    final taskName =
+                        document['nama_tugas'].toString().toLowerCase();
+                    return taskName.contains(searchQuery.toLowerCase());
+                  }).toList();
+
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: DataTable(
+                        columns: _createColumns(),
+                        rows: _createRows(filteredDocuments),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -121,5 +151,110 @@ class _TaskListPage extends State<TugasListPage> {
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  List<DataColumn> _createColumns() {
+    return [
+      DataColumn(label: Text('No')),
+      DataColumn(label: Text('Nama Tugas')),
+      DataColumn(label: Text('PIC')),
+      DataColumn(label: Text('Frekuensi')),
+      if (widget.month.isNotEmpty) DataColumn(label: Text('Ketegori')),
+      DataColumn(label: Text('Aksi')),
+    ];
+  }
+
+  List<DataRow> _createRows(List<QueryDocumentSnapshot> documents) {
+    return documents.asMap().entries.map((entry) {
+      int index = entry.key;
+      DocumentSnapshot document = entry.value;
+
+      return DataRow(cells: [
+        DataCell(Text((index + 1).toString())),
+        DataCell(Text(document['nama_tugas'])),
+        DataCell(Text(document['pic'])),
+        DataCell(Text(document['frekuensi'])),
+        if (widget.month.isNotEmpty) DataCell(Text(document['kategori_tugas'])),
+        DataCell(Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            GestureDetector(
+              onTap: () {
+                showDeleteConfirmationDialog(context, document);
+              },
+              child: Container(
+                height: 30,
+                width: 30,
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade700,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.delete_outline, color: Colors.white),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                navToDetailsTask(context, document);
+              },
+              child: Container(
+                height: 30,
+                width: 30,
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade700,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.library_books_outlined, color: Colors.white),
+              ),
+            ),
+          ],
+        )),
+      ]);
+    }).toList();
+  }
+
+  void showDeleteConfirmationDialog(
+      BuildContext context, DocumentSnapshot document) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Konfirmasi"),
+          content: const Text("Apakah anda ingin menghapus data ini ?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Batal"),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteDataKaryawan(document);
+                Navigator.pop(context);
+                showDeleteSuccessNotification(context);
+              },
+              child: const Text("Hapus"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showDeleteSuccessNotification(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text("Data berhasil dihapus!"),
+      backgroundColor: Color.fromARGB(255, 255, 17, 0),
+      duration: Duration(seconds: 3),
+    ));
+  }
+
+  void deleteDataKaryawan(DocumentSnapshot document) async {
+    try {
+      await document.reference.delete();
+      print("Deleted");
+    } catch (e) {
+      print("Error deleting: $e");
+    }
   }
 }

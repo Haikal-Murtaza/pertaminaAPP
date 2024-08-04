@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'datatugas_list.dart';
 
 class TugasItem extends StatelessWidget {
   final String searchQuery;
@@ -37,11 +36,7 @@ class TugasItem extends StatelessWidget {
           return ListView.builder(
             itemCount: tugasitems.length,
             itemBuilder: (context, index) {
-              DocumentSnapshot document = tugasitems[index];
-              return TugasListItem(
-                document: document,
-                month: month,
-              );
+              return null;
             },
           );
         }

@@ -1,6 +1,8 @@
 import 'dart:ffi';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pertamina_app/daftar_tugas/datatugas_details.dart';
 import 'daftar_pekerja/datakaryawan_add.dart';
 import 'daftar_pekerja/datakaryawan_page.dart';
 import 'daftar_tugas/datatugas_add.dart';
@@ -55,6 +57,16 @@ void navToAdd(BuildContext context) {
 void navToAddTask(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => AddDataTugasPage()));
+}
+
+void navToDetailsTask(
+    BuildContext context, DocumentSnapshot<Object?> document) {
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => DetailsDataTugasPage(
+                document: document,
+              )));
 }
 
 void navToProfileUi(BuildContext context) {
