@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'datatugas_list.dart';
-
 
 class TugasItem extends StatelessWidget {
   final String searchQuery;
+  final String month;
 
-  const TugasItem({required this.searchQuery});
+  const TugasItem({required this.searchQuery, required this.month});
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +25,9 @@ class TugasItem extends StatelessWidget {
             child: Text('Error: ${snapshot.error}'),
           );
         } else {
-          List<DocumentSnapshot> karyawanItems = snapshot.data!.docs;
+          List<DocumentSnapshot> tugasitems = snapshot.data!.docs;
           if (searchQuery.isNotEmpty) {
-            karyawanItems = karyawanItems.where((doc) {
+            tugasitems = tugasitems.where((doc) {
               return doc['nama_tugas']
                   .toString()
                   .toLowerCase()
@@ -36,10 +35,13 @@ class TugasItem extends StatelessWidget {
             }).toList();
           }
           return ListView.builder(
-            itemCount: karyawanItems.length,
+            itemCount: tugasitems.length,
             itemBuilder: (context, index) {
-              DocumentSnapshot document = karyawanItems[index];
-              return TugasListItem(document: document);
+              DocumentSnapshot document = tugasitems[index];
+              return TugasListItem(
+                document: document,
+                month: month,
+              );
             },
           );
         }

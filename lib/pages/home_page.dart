@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => TaskListPage(
+                                          builder: (context) => TugasListPage(
                                               category:
                                                   'Tasks for ${DateFormat('MMMM').format(DateTime(0, index + 1))}',
                                               tasks:
@@ -138,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          TaskListPage(category: name, tasks: tasks)));
+                          TugasListPage(category: name, tasks: tasks)));
             },
             child: Card(
                 color: color,

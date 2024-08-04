@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:pertamina_app/nav.dart';
 import 'datatugas_item.dart';
 
-class TaskListPage extends StatefulWidget {
+class TugasListPage extends StatefulWidget {
   final String category;
   final int tasks;
   final String month;
 
-  TaskListPage({required this.category, required this.tasks, this.month = ''});
+  TugasListPage({required this.category, required this.tasks, this.month = ''});
 
   @override
-  State<TaskListPage> createState() => _TaskListPage();
+  State<TugasListPage> createState() => _TaskListPage();
 }
 
-class _TaskListPage extends State<TaskListPage> {
+class _TaskListPage extends State<TugasListPage> {
   late TextEditingController _searchController;
   String searchQuery = '';
 
@@ -106,7 +106,10 @@ class _TaskListPage extends State<TaskListPage> {
                 },
               ),
             ),
-            Expanded(child: TugasItem(searchQuery: searchQuery)),
+            Expanded(
+                child: TugasItem(
+                    searchQuery: searchQuery,
+                    month: widget.month)), // Pass month here
           ],
         ),
       ),
