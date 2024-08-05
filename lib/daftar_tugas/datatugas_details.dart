@@ -19,6 +19,8 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
   late String selectedKategori;
   late String selectedStartMonth;
 
+  bool isEditMode = false;
+
   List<String> picOptions = [
     'Paramedis',
     'Spv I HSSE & FS',
@@ -58,10 +60,29 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
     super.initState();
     namaTugas = TextEditingController(text: widget.document['nama_tugas']);
     deskripsi = TextEditingController(text: widget.document['deskripsi']);
-    selectedPIC = widget.document['pic'];
-    selectedFrekuensi = widget.document['frekuensi'];
-    selectedKategori = widget.document['kategori_tugas'];
-    selectedStartMonth = widget.document['bulanMulai'] ?? 'January';
+
+    selectedPIC = widget.document['pic'] ?? picOptions[0];
+    selectedFrekuensi = widget.document['frekuensi'] ?? frekuensiOptions[0];
+    selectedKategori = widget.document['kategori_tugas'] ?? kategoriOptions[0];
+    selectedStartMonth = widget.document['bulanMulai'] ?? '';
+
+    validateDropdownValue();
+  }
+
+  void validateDropdownValue() {
+    if (!picOptions.contains(selectedPIC)) {
+      selectedPIC = picOptions[0];
+    }
+    if (!frekuensiOptions.contains(selectedFrekuensi)) {
+      selectedFrekuensi = frekuensiOptions[0];
+    }
+    if (!kategoriOptions.contains(selectedKategori)) {
+      selectedKategori = kategoriOptions[0];
+    }
+    if (!monthOptions.contains(selectedStartMonth) &&
+        selectedStartMonth.isNotEmpty) {
+      selectedStartMonth = monthOptions[0];
+    }
   }
 
   @override
@@ -87,20 +108,26 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              buildTextField('Nama Tugas', namaTugas, setWidth, false),
-              buildDropdownField('PIC', selectedPIC, picOptions, false),
+              buildTextField('Nama Tugas', namaTugas, setWidth, isEditMode),
+              buildDropdownField('PIC', selectedPIC, picOptions, isEditMode),
               buildDropdownField(
-                  'Frekuensi', selectedFrekuensi, frekuensiOptions, false),
+                  'Frekuensi', selectedFrekuensi, frekuensiOptions, isEditMode),
               buildDropdownField(
-                  'Kategori', selectedKategori, kategoriOptions, false),
-              buildDropdownField('Mulai Pada Bulan', selectedStartMonth,
-                  monthOptions, selectedFrekuensi != 'Mingguan'),
-              buildTextField('Deskripsi', deskripsi, setWidth, false,
+                  'Kategori', selectedKategori, kategoriOptions, isEditMode),
+              buildDropdownField(
+                  'Mulai Pada Bulan',
+                  selectedStartMonth,
+                  monthOptions,
+                  isEditMode &&
+                      selectedFrekuensi != 'Mingguan' &&
+                      selectedStartMonth.isNotEmpty),
+              buildTextField('Deskripsi', deskripsi, setWidth, isEditMode,
                   isMultiLine: true),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  buildButton('Edit', Colors.orange, _editTask),
+                  buildButton(isEditMode ? 'Save' : 'Edit', Colors.orange,
+                      _toggleEditMode),
                   buildButton('Upload Document', Colors.blue, _uploadDocument),
                 ],
               ),
@@ -154,7 +181,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
         SizedBox(
           height: 60,
           child: DropdownButtonFormField(
-            value: value,
+            value: value.isNotEmpty ? value : null,
             items: options.map((String option) {
               return DropdownMenuItem(
                 value: option,
@@ -164,7 +191,16 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             onChanged: enabled
                 ? (newValue) {
                     setState(() {
-                      value = newValue.toString();
+                      switch (label) {
+                        case 'PIC':
+                          selectedPIC = newValue.toString();
+                        case 'Frekuensi':
+                          selectedFrekuensi = newValue.toString();
+                        case 'Kategori':
+                          selectedKategori = newValue.toString();
+                        case 'Mulai Pada Bulan':
+                          selectedStartMonth = newValue.toString();
+                      }
                     });
                   }
                 : null,
@@ -204,11 +240,59 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
     );
   }
 
-  void _editTask() {
-    // Implement edit task functionality
+  void _toggleEditMode() {
+    setState(() {
+      isEditMode = !isEditMode;
+      if (!isEditMode) {
+        _saveTask();
+      }
+    });
+  }
+
+  Future<void> _saveTask() async {
+    try {
+      String nama = namaTugas.text.trim();
+      String pIc = selectedPIC.trim();
+      String frekuensiTugas = selectedFrekuensi.trim();
+      String kategoriTugas = selectedKategori.trim();
+      String bulanMulai =
+          selectedFrekuensi == 'Mingguan' ? '' : selectedStartMonth.trim();
+      String deskripsiTugas = deskripsi.text.trim();
+
+      if (nama.isNotEmpty) {
+        await FirebaseFirestore.instance
+            .collection('data_tugas')
+            .doc(widget.document.id)
+            .update({
+          'nama_tugas': nama,
+          'pic': pIc,
+          'frekuensi': frekuensiTugas,
+          'kategori_tugas': kategoriTugas,
+          'bulanMulai': bulanMulai,
+          'deskripsi': deskripsiTugas,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Data tugas berhasil diupdate!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
+        ));
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Mohon masukkan data yang benar!'),
+          duration: Duration(seconds: 2),
+        ));
+      }
+    } catch (e) {
+      print('Error updating task: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('An error occurred. Please try again later.'),
+        duration: Duration(seconds: 2),
+      ));
+    }
   }
 
   void _uploadDocument() {
-    // Implement document upload functionality
+    // Implement document upload
   }
 }

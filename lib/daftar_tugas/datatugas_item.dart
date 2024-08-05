@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 
 class TugasItem extends StatelessWidget {
   final String searchQuery;
-  final String month;
 
-  const TugasItem({required this.searchQuery, required this.month});
+  const TugasItem({required this.searchQuery});
 
   @override
   Widget build(BuildContext context) {

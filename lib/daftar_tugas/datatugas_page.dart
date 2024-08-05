@@ -229,7 +229,7 @@ class _TaskListPage extends State<TugasListPage> {
             ),
             TextButton(
               onPressed: () {
-                deleteDataKaryawan(document);
+                deleteDataTugas(document);
                 Navigator.pop(context);
                 showDeleteSuccessNotification(context);
               },
@@ -249,7 +249,7 @@ class _TaskListPage extends State<TugasListPage> {
     ));
   }
 
-  void deleteDataKaryawan(DocumentSnapshot document) async {
+  void deleteDataTugas(DocumentSnapshot document) async {
     try {
       await document.reference.delete();
       print("Deleted");
