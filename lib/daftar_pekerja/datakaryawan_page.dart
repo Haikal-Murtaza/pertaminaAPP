@@ -54,7 +54,7 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Image.asset('assets/logo.png', width: 150),
+                              Image.asset('assets/logo.png', width: 40),
                             ])),
                     Padding(
                         padding:

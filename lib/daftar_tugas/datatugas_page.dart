@@ -17,6 +17,14 @@ class _TugasListPageState extends State<TugasListPage> {
   late TextEditingController _searchController;
   String searchQuery = '';
 
+  List<String> status = [
+    'Completed',
+    'Denied',
+    'Progress',
+    'Pending',
+    'Not Completed',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -60,18 +68,22 @@ class _TugasListPageState extends State<TugasListPage> {
                 children: [
                   Padding(
                     padding:
-                        const EdgeInsets.only(top: 40, left: 20, right: 20),
+                        const EdgeInsets.only(top: 40, left: 20, right: 130),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Image.asset('assets/logo.png', width: 150),
+                        Image.asset('assets/logo.png', width: 40),
+                        Text(
+                          'Tugas Rutin dan Non Rutin',
+                          style: TextStyle(fontSize: 17),
+                        ),
                       ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 20, right: 5),
+                    padding:
+                        const EdgeInsets.only(top: 10, left: 20, right: 20),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
                           onPressed: () {
@@ -83,11 +95,14 @@ class _TugasListPageState extends State<TugasListPage> {
                             color: Colors.black,
                           ),
                         ),
+                        SizedBox(width: 5),
                         Text(
-                          'Tugas Rutin dan Non Rutin ${widget.month.isEmpty ? widget.category : "bulan ${widget.month}"}',
-                          style: TextStyle(fontSize: 14),
+                          widget.month.isEmpty
+                              ? "Kategori ${widget.category}"
+                              : "Bulan ${widget.month}",
+                          style: TextStyle(fontSize: 16),
                         ),
-                        SizedBox(width: 50),
+                        Spacer(),
                       ],
                     ),
                   ),
@@ -172,6 +187,7 @@ class _TugasListPageState extends State<TugasListPage> {
       DataColumn(label: Text('PIC')),
       DataColumn(label: Text('Frekuensi')),
       if (widget.month.isNotEmpty) DataColumn(label: Text('Kategori')),
+      DataColumn(label: Text('Status')),
       DataColumn(label: Text('Aksi')),
     ];
   }
@@ -187,6 +203,7 @@ class _TugasListPageState extends State<TugasListPage> {
         DataCell(Text(document['pic'])),
         DataCell(Text(document['frekuensi'])),
         if (widget.month.isNotEmpty) DataCell(Text(document['kategori_tugas'])),
+        DataCell(Text(status[document['status']])),
         DataCell(Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [

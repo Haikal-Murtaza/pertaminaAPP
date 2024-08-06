@@ -199,6 +199,7 @@ class _AddDataTugasPage extends State<AddDataTugasPage> {
       String bulanMulai =
           selectedFrekuensi == 'Mingguan' ? '' : selectedStartMonth.trim();
       String deskripsiTugas = deskripsi.text.trim();
+      int number = 4;
 
       if (nama.isNotEmpty) {
         await FirebaseFirestore.instance.collection('data_tugas').add({
@@ -208,6 +209,7 @@ class _AddDataTugasPage extends State<AddDataTugasPage> {
           'kategori_tugas': kategoriTugas,
           'bulanMulai': bulanMulai,
           'deskripsi': deskripsiTugas,
+          'status': number,
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Data tugas berhasil ditambahkan!'),

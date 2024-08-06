@@ -17,7 +17,25 @@ class AdminPage extends StatelessWidget {
               },
               child: ListTile(
                 leading: Icon(Icons.task),
-                title: Text('Daftar Tugas Telah Dikerjakan'),
+                title: Text('Daftar Tugas Completed'),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                navApproveTaskPage(context);
+              },
+              child: ListTile(
+                leading: Icon(Icons.approval),
+                title: Text('Daftar Tugas Menunggu Approval'),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                navReviewTaskPage(context);
+              },
+              child: ListTile(
+                leading: Icon(Icons.reviews),
+                title: Text('Daftar Tugas Menunggu Review'),
               ),
             ),
             GestureDetector(

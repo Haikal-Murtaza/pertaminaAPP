@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pertamina_app/daftar_tugas/datatugas_page.dart';
@@ -33,7 +34,7 @@ class _HomePageState extends State<HomePage> {
                                     image: AssetImage('assets/logo.png'),
                                     fit: BoxFit.fitHeight),
                                 borderRadius: BorderRadius.circular(4.0)),
-                            width: 230,
+                            width: 100,
                             height: 50)
                       ]),
                       // Row for username, date, and profile picture
@@ -82,14 +83,14 @@ class _HomePageState extends State<HomePage> {
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildCard(context, 'Health', 10, Colors.orange),
-                            _buildCard(context, 'Safety', 8, Colors.red)
+                            _buildCard(context, 'HEALTH', Colors.orange),
+                            _buildCard(context, 'SAFETY', Colors.red)
                           ]),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildCard(context, 'Security', 15, Colors.blue),
-                            _buildCard(context, 'Environment', 20, Colors.green)
+                            _buildCard(context, 'SECURITY', Colors.blue),
+                            _buildCard(context, 'ENVIRONTMENT', Colors.green)
                           ]),
                       SizedBox(height: 20),
                       // Title for Section 2
@@ -128,43 +129,80 @@ class _HomePageState extends State<HomePage> {
                     ]))));
   }
 
-  // Function to create category task card
-  Widget _buildCard(BuildContext context, String name, int tasks, Color color) {
-    double progress = tasks / 20;
+  Widget _buildCard(BuildContext context, String name, Color color) {
     return Expanded(
-        child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => TugasListPage(
-                          category: name.toUpperCase(), tasks: tasks)));
-            },
-            child: Card(
-                color: color,
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(name,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16)),
-                          SizedBox(height: 8),
-                          Text('Tasks: $tasks',
-                              style: TextStyle(color: Colors.white)),
-                          SizedBox(height: 8),
-                          Row(children: [
-                            Expanded(
-                                child: LinearProgressIndicator(
-                                    value: progress,
-                                    backgroundColor:
-                                        Colors.white.withOpacity(0.3),
-                                    color: Colors.white)),
-                            SizedBox(width: 8),
-                            Text('${(progress * 100).toInt()}%',
-                                style: TextStyle(color: Colors.white))
-                          ])
-                        ])))));
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TugasListPage(
+                category: name.toUpperCase(),
+                tasks: 0,
+              ),
+            ),
+          );
+        },
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('data_tugas')
+              .where('kategori_tugas', isEqualTo: name)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            int totalTasks = snapshot.data!.docs.length;
+            int completedTasks = snapshot.data!.docs
+                .where((doc) => doc['status'] == true)
+                .length;
+            double progress = totalTasks > 0 ? completedTasks / totalTasks : 0;
+
+            return Card(
+              color: color,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Tugas: $totalTasks',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            backgroundColor: Colors.white.withOpacity(0.3),
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '${(progress * 100).toInt()}%',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

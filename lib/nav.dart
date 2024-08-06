@@ -3,12 +3,14 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pertamina_app/daftar_tugas/datatugas_details.dart';
+import 'package:pertamina_app/pages/approve_task_list_page.dart';
+import 'package:pertamina_app/pages/review_task_list_page.dart';
 import 'daftar_pekerja/datakaryawan_add.dart';
 import 'daftar_pekerja/datakaryawan_page.dart';
 import 'daftar_tugas/datatugas_add.dart';
 import 'pages/about_page.dart';
 import 'pages/admin_page.dart';
-import 'daftar_tugas/completed_task_list_page.dart';
+import 'pages/completed_task_list_page.dart';
 import 'pages/notification_page.dart';
 import 'pages/privacy_page.dart';
 import 'profil/profile.dart';
@@ -42,6 +44,16 @@ void navLogout(BuildContext context) {
 void navCompletedTaskPage(BuildContext context) {
   Navigator.push(context,
       MaterialPageRoute(builder: (context) => CompletedTaskListPage()));
+}
+
+void navApproveTaskPage(BuildContext context) {
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => ApproveTaskListPage()));
+}
+
+void navReviewTaskPage(BuildContext context) {
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => ReviewTaskListPage()));
 }
 
 void navEmployeePage(BuildContext context) {
