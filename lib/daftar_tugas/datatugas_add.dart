@@ -72,171 +72,118 @@ class _AddDataTugasPage extends State<AddDataTugasPage> {
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              Container(
-                height: 60,
-                alignment: Alignment.centerLeft,
-                child: Text('Nama Tugas', style: TextStyle(fontSize: 18)),
-              ),
-              SizedBox(
-                height: 60,
-                width: setWidth,
-                child: TextFormField(
-                  controller: namaTugas,
-                  textAlignVertical: TextAlignVertical.bottom,
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.centerLeft,
-                child: Text('PIC', style: TextStyle(fontSize: 18)),
-              ),
-              SizedBox(
-                height: 60,
-                width: setWidth,
-                child: DropdownButtonFormField(
-                  value: selectedPIC,
-                  items: picOptions.map((String pic) {
-                    return DropdownMenuItem(
-                      value: pic,
-                      child: Text(pic),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedPIC = newValue.toString();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.centerLeft,
-                child: Text('Frekuensi', style: TextStyle(fontSize: 18)),
-              ),
-              SizedBox(
-                height: 60,
-                width: setWidth,
-                child: DropdownButtonFormField(
-                  value: selectedFrekuensi,
-                  items: frekuensiOptions.map((String frekuensi) {
-                    return DropdownMenuItem(
-                      value: frekuensi,
-                      child: Text(frekuensi),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedFrekuensi = newValue.toString();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.centerLeft,
-                child: Text('Kategori', style: TextStyle(fontSize: 18)),
-              ),
-              SizedBox(
-                height: 60,
-                width: setWidth,
-                child: DropdownButtonFormField(
-                  value: selectedKategori,
-                  items: kategoriOptions.map((String kategori) {
-                    return DropdownMenuItem(
-                      value: kategori,
-                      child: Text(kategori),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedKategori = newValue.toString();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.centerLeft,
-                child: Text('Mulai Pada Bulan', style: TextStyle(fontSize: 18)),
-              ),
-              SizedBox(
-                height: 60,
-                width: setWidth,
-                child: DropdownButtonFormField(
-                  value: selectedStartMonth,
-                  items: monthOptions.map((String month) {
-                    return DropdownMenuItem(
-                      value: month,
-                      child: Text(month),
-                    );
-                  }).toList(),
-                  onChanged: selectedFrekuensi == 'Mingguan'
-                      ? null
-                      : (newValue) {
-                          setState(() {
-                            selectedStartMonth = newValue.toString();
-                          });
-                        },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Container(
-                height: 60,
-                alignment: Alignment.centerLeft,
-                child: Text('Deskripsi', style: TextStyle(fontSize: 18)),
-              ),
-              SizedBox(
-                height: 120,
-                width: setWidth,
-                child: TextFormField(
-                  controller: deskripsi,
-                  textAlignVertical: TextAlignVertical.top,
-                  maxLines: 6,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.all(20),
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                height: 50,
-                width: 150,
-                decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  border: Border.all(color: Colors.grey.shade700),
-                ),
-                child: GestureDetector(
-                  onTap: () {
-                    _addKaryawan(context);
-                  },
-                  child: Center(
-                    child: Text(
-                      'Add',
-                      style: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              buildTextField('Nama Tugas', namaTugas, setWidth),
+              buildDropdownField('PIC', selectedPIC, picOptions),
+              buildDropdownField(
+                  'Frekuensi', selectedFrekuensi, frekuensiOptions),
+              buildDropdownField('Kategori', selectedKategori, kategoriOptions),
+              buildDropdownField('Mulai Pada Bulan', selectedStartMonth,
+                  monthOptions, selectedFrekuensi == 'Mingguan'),
+              buildTextField('Deskripsi', deskripsi, setWidth,
+                  isMultiLine: true),
+              buildButton('Add', Colors.grey, _addKaryawan),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextField(
+      String label, TextEditingController controller, double width,
+      {bool isMultiLine = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 60,
+          alignment: Alignment.centerLeft,
+          child: Text(label, style: TextStyle(fontSize: 18)),
+        ),
+        SizedBox(
+          height: isMultiLine ? 120 : 60,
+          width: width,
+          child: TextFormField(
+            controller: controller,
+            textAlignVertical:
+                isMultiLine ? TextAlignVertical.top : TextAlignVertical.bottom,
+            style: TextStyle(fontSize: 16),
+            maxLines: isMultiLine ? 6 : 1,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildDropdownField(String label, String value, List<String> options,
+      [bool isDisabled = false]) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 60,
+          alignment: Alignment.centerLeft,
+          child: Text(label, style: TextStyle(fontSize: 18)),
+        ),
+        SizedBox(
+          height: 60,
+          child: DropdownButtonFormField(
+            value: value,
+            items: options.map((String option) {
+              return DropdownMenuItem(
+                value: option,
+                child: Text(option),
+              );
+            }).toList(),
+            onChanged: isDisabled
+                ? null
+                : (newValue) {
+                    setState(() {
+                      switch (label) {
+                        case 'PIC':
+                          selectedPIC = newValue.toString();
+                        case 'Frekuensi':
+                          selectedFrekuensi = newValue.toString();
+                        case 'Kategori':
+                          selectedKategori = newValue.toString();
+                        case 'Mulai Pada Bulan':
+                          selectedStartMonth = newValue.toString();
+                      }
+                    });
+                  },
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildButton(String label, Color color, Function onPressed) {
+    return Container(
+      margin: EdgeInsets.all(20),
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      height: 50,
+      width: 150,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+        border: Border.all(color: color),
+      ),
+      child: GestureDetector(
+        onTap: () => onPressed(context),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
         ),
       ),
@@ -267,7 +214,9 @@ class _AddDataTugasPage extends State<AddDataTugasPage> {
           backgroundColor: Colors.green,
           duration: Duration(seconds: 4),
         ));
-        Navigator.pop(context);
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pop(context);
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Mohon masukkan data yang benar!'),

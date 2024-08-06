@@ -10,10 +10,10 @@ class TugasListPage extends StatefulWidget {
   TugasListPage({required this.category, required this.tasks, this.month = ''});
 
   @override
-  State<TugasListPage> createState() => _TaskListPage();
+  State<TugasListPage> createState() => _TugasListPageState();
 }
 
-class _TaskListPage extends State<TugasListPage> {
+class _TugasListPageState extends State<TugasListPage> {
   late TextEditingController _searchController;
   String searchQuery = '';
 
@@ -21,10 +21,12 @@ class _TaskListPage extends State<TugasListPage> {
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _searchController.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -67,8 +69,7 @@ class _TaskListPage extends State<TugasListPage> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.only(top: 10, left: 20, right: 15),
+                    padding: const EdgeInsets.only(top: 10, left: 20, right: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -107,10 +108,16 @@ class _TaskListPage extends State<TugasListPage> {
               ),
             ),
             Expanded(
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('data_tugas')
-                    .snapshots(),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: (widget.month.isEmpty
+                    ? FirebaseFirestore.instance
+                        .collection('data_tugas')
+                        .where('kategori_tugas', isEqualTo: widget.category)
+                        .snapshots()
+                    : FirebaseFirestore.instance
+                        .collection('data_tugas')
+                        .where('bulanMulai', isEqualTo: widget.month)
+                        .snapshots()),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
@@ -120,12 +127,17 @@ class _TaskListPage extends State<TugasListPage> {
                     return Center(child: CircularProgressIndicator());
                   }
 
-                  final filteredDocuments =
-                      snapshot.data!.docs.where((document) {
+                  final documents = snapshot.data?.docs ?? [];
+
+                  final filteredDocuments = documents.where((document) {
                     final taskName =
                         document['nama_tugas'].toString().toLowerCase();
                     return taskName.contains(searchQuery.toLowerCase());
                   }).toList();
+
+                  if (filteredDocuments.isEmpty) {
+                    return Center(child: Text('No tasks found.'));
+                  }
 
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -159,7 +171,7 @@ class _TaskListPage extends State<TugasListPage> {
       DataColumn(label: Text('Nama Tugas')),
       DataColumn(label: Text('PIC')),
       DataColumn(label: Text('Frekuensi')),
-      if (widget.month.isNotEmpty) DataColumn(label: Text('Ketegori')),
+      if (widget.month.isNotEmpty) DataColumn(label: Text('Kategori')),
       DataColumn(label: Text('Aksi')),
     ];
   }

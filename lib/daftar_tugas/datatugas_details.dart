@@ -128,7 +128,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
                 children: [
                   buildButton(isEditMode ? 'Save' : 'Edit', Colors.orange,
                       _toggleEditMode),
-                  buildButton('Upload Document', Colors.blue, _uploadDocument),
+                  buildButton('Upload', Colors.blue, _uploadDocument),
                 ],
               ),
             ],
@@ -218,7 +218,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
       margin: EdgeInsets.all(20),
       padding: EdgeInsets.symmetric(horizontal: 8),
       height: 50,
-      width: 150,
+      width: 130,
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.all(Radius.circular(5)),

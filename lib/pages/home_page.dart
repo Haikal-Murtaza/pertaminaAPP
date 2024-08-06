@@ -130,15 +130,15 @@ class _HomePageState extends State<HomePage> {
 
   // Function to create category task card
   Widget _buildCard(BuildContext context, String name, int tasks, Color color) {
-    double progress = tasks / 20; // Dummy progress value
+    double progress = tasks / 20;
     return Expanded(
         child: GestureDetector(
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          TugasListPage(category: name, tasks: tasks)));
+                      builder: (context) => TugasListPage(
+                          category: name.toUpperCase(), tasks: tasks)));
             },
             child: Card(
                 color: color,
