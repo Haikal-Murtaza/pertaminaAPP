@@ -41,12 +41,6 @@ class ProfilePage extends StatelessWidget {
             child: ListView(
               children: [
                 ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('Profile'),
-                    onTap: () {
-                      navToProfileUi(context);
-                    }),
-                ListTile(
                     leading: Icon(Icons.notifications),
                     title: Text('Notifications'),
                     onTap: () {

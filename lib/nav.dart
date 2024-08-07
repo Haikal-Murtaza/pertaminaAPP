@@ -13,7 +13,6 @@ import 'pages/admin_page.dart';
 import 'pages/completed_task_list_page.dart';
 import 'pages/notification_page.dart';
 import 'pages/privacy_page.dart';
-import 'profil/profile.dart';
 import 'user_account/login_page.dart';
 
 // navigation profile page
@@ -79,10 +78,6 @@ void navToDetailsTask(
           builder: (context) => DetailsDataTugasPage(
                 document: document,
               )));
-}
-
-void navToProfileUi(BuildContext context) {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileUi()));
 }
 
 Color maroon = Colors.red.shade900;

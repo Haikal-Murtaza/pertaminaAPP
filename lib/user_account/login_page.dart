@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
 import 'package:pertamina_app/bottomnavbar.dart';
 import 'package:pertamina_app/nav.dart';
-import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -11,188 +10,241 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _isObsure = true;
 
   Future<void> _login() async {
-    String username = usernameController.text;
+    String email = emailController.text;
     String password = passwordController.text;
 
-    if (username.isEmpty || password.isEmpty) {
-      _showErrorDialog('Tolong isi username dan password');
+    if (email.isEmpty || password.isEmpty) {
+      _showErrorDialog('Tolong isi email dan password');
       return;
     }
 
     try {
-      QuerySnapshot userQuery = await FirebaseFirestore.instance
-          .collection('data_karyawan')
-          .where('username', isEqualTo: username)
-          .get();
+      // Sign in with email and password
+      final userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      if (userQuery.docs.isEmpty) {
-        _showErrorDialog('User not found');
-        return;
-      }
+      User? user = userCredential.user;
 
-      var userData = userQuery.docs.first.data() as Map<String, dynamic>;
-      String storedHashedPassword = userData['password'];
+      if (user != null) {
+        // Get user data from Firestore using the UID
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('data_karyawan')
+            .doc(user.uid)
+            .get();
 
-      if (_hashPassword(password) == storedHashedPassword) {
-        String name = userData['nama_karyawan'];
-        String level = userData['level'];
-        Navigator.pushReplacement(
+        if (userDoc.exists) {
+          var userData = userDoc.data() as Map<String, dynamic>;
+          String name = userData['nama_karyawan'];
+          String role = userData['role'];
+
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-            builder: (context) => NavBar(name: name, level: level),
-          ),
-        );
+              builder: (context) => NavBar(name: name, role: role),
+            ),
+          );
+        } else {
+          _showErrorDialog(
+              'User data not found in Firestore for UID: ${user.uid}');
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      // Handle Firebase Auth errors
+      if (e.code == 'user-not-found') {
+        _showErrorDialog('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        _showErrorDialog('Wrong password provided.');
       } else {
-        _showErrorDialog('Password tidak sesuai');
+        _showErrorDialog('Firebase Auth Error: ${e.message}');
       }
     } catch (e) {
+      // Handle other errors
       _showErrorDialog('An error occurred: $e');
     }
   }
 
-  String _hashPassword(String password) {
-    final bytes = utf8.encode(password);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
   void _showErrorDialog(String message) {
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-              title: Text('Error'),
-              content: Text(message),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('OK'))
-              ]);
-        });
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      alignment: Alignment.topCenter,
-      child: Column(children: [
-        // Logo at the center top
-        Container(
-            margin: EdgeInsets.only(top: 60),
-            width: 250,
-            height: 175,
-            decoration: BoxDecoration(
+      body: Container(
+        alignment: Alignment.topCenter,
+        child: Column(
+          children: [
+            // Logo at the center top
+            Container(
+              margin: EdgeInsets.only(top: 60),
+              width: 250,
+              height: 175,
+              decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/logo.png'),
-                    fit: BoxFit.contain))),
-        SizedBox(height: 20),
-        Text('SILAHKAN LOGIN',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        SizedBox(height: 20),
-        // Username input box
-        Container(
-            width: 300,
-            height: 55,
-            decoration: BoxDecoration(
+                  image: AssetImage('assets/logo.png'),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'SILAHKAN LOGIN',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            // Email input box
+            Container(
+              width: 300,
+              height: 55,
+              decoration: BoxDecoration(
                 color: Colors.grey.shade300,
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 3,
-                      offset: Offset(0, 5))
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 3,
+                    offset: Offset(0, 5),
+                  ),
                 ],
-                borderRadius: BorderRadius.all(Radius.circular(25))),
-            child: Row(
+                borderRadius: BorderRadius.all(Radius.circular(25)),
+              ),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                      width: 250,
-                      child: Padding(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: TextFormField(
-                              controller: usernameController,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  fillColor: Colors.black,
-                                  hintText: 'Username',
-                                  hintStyle: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 15,
-                                      color: Colors.black))))),
+                    width: 250,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: TextFormField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Colors.black,
+                          hintText: 'Email',
+                          hintStyle: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.account_circle_outlined,
-                          size: 35, weight: 0.5))
-                ])),
-        SizedBox(height: 20),
-        // Password input box
-        Container(
-            width: 300,
-            height: 55,
-            decoration: BoxDecoration(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Icon(
+                      Icons.email_outlined,
+                      size: 35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            // Password input box
+            Container(
+              width: 300,
+              height: 55,
+              decoration: BoxDecoration(
                 color: Colors.grey.shade300,
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 3,
-                      offset: Offset(0, 5))
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 3,
+                    offset: Offset(0, 5),
+                  ),
                 ],
-                borderRadius: BorderRadius.all(Radius.circular(25))),
-            child: Row(
+                borderRadius: BorderRadius.all(Radius.circular(25)),
+              ),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                      width: 250,
-                      child: Padding(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: TextFormField(
-                              controller: passwordController,
-                              obscureText: _isObsure,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  fillColor: Colors.black,
-                                  hintText: 'Password',
-                                  hintStyle: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 15,
-                                      color: Colors.black))))),
+                    width: 250,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: TextFormField(
+                        controller: passwordController,
+                        obscureText: _isObsure,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: Colors.black,
+                          hintText: 'Password',
+                          hintStyle: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isObsure = !_isObsure;
-                            });
-                          },
-                          child: Icon(
-                              _isObsure
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              size: 35)))
-                ])),
-        SizedBox(height: 25),
-        // Login button
-        SizedBox(
-            width: 300,
-            height: 55,
-            child: ElevatedButton(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isObsure = !_isObsure;
+                        });
+                      },
+                      child: Icon(
+                        _isObsure
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        size: 35,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 25),
+            // Login button
+            SizedBox(
+              width: 300,
+              height: 55,
+              child: ElevatedButton(
                 onPressed: _login,
                 style: ButtonStyle(
-                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25))),
-                    backgroundColor: WidgetStatePropertyAll(maroon)),
-                child: Text('Login',
-                    style: TextStyle(fontSize: 18, color: Colors.white)))),
-      ]),
-    ));
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                  ),
+                  backgroundColor: WidgetStateProperty.all(Colors.red),
+                ),
+                child: Text(
+                  'Login',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

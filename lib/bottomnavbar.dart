@@ -5,9 +5,9 @@ import 'package:pertamina_app/pages/profile_page.dart';
 
 class NavBar extends StatefulWidget {
   final String name;
-  final String level;
+  final String role;
 
-  NavBar({required this.name, required this.level});
+  NavBar({required this.name, required this.role});
 
   @override
   _NavBarState createState() => _NavBarState();
