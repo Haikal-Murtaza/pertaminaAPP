@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class DetailsDataTugasPage extends StatefulWidget {
@@ -292,7 +296,53 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
     }
   }
 
-  void _uploadDocument() {
-    // Implement document upload
+  Future<void> _uploadDocument() async {
+    try {
+      // Pick a file
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+      if (result != null) {
+        // Get the file
+        PlatformFile file = result.files.first;
+
+        // Get a reference to the storage bucket
+        FirebaseStorage storage = FirebaseStorage.instance;
+        Reference ref = storage.ref().child('documents/${file.name}');
+
+        // Upload the file
+        UploadTask uploadTask = ref.putFile(File(file.path!));
+
+        // Wait for the upload to complete
+        TaskSnapshot snapshot = await uploadTask;
+
+        // Get the file's download URL
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+
+        // Save the file metadata to Firestore
+        await FirebaseFirestore.instance.collection('documents').add({
+          'name': file.name,
+          'url': downloadUrl,
+          'uploaded_at': FieldValue.serverTimestamp(),
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Document uploaded successfully!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
+        ));
+      } else {
+        // User canceled the picker
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('No file selected'),
+          duration: Duration(seconds: 2),
+        ));
+      }
+    } catch (e) {
+      print('Error uploading document: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('An error occurred. Please try again later.'),
+        duration: Duration(seconds: 2),
+      ));
+    }
   }
 }
