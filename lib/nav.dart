@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pertamina_app/daftar_pekerja/datakaryawan_details.dart';
 import 'package:pertamina_app/daftar_tugas/datatugas_details.dart';
 import 'package:pertamina_app/pages/approve_task_list_page.dart';
 import 'package:pertamina_app/pages/review_task_list_page.dart';
@@ -65,6 +66,14 @@ void navToAdd(BuildContext context) {
       context, MaterialPageRoute(builder: (context) => AddDataKaryawanPage()));
 }
 
+void navToDetailsKaryawan(
+    BuildContext context, DocumentSnapshot<Object?> document) {
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => DetailsDataKaryawanPage(document: document)));
+}
+
 void navToAddTask(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => AddDataTugasPage()));
@@ -75,9 +84,7 @@ void navToDetailsTask(
   Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => DetailsDataTugasPage(
-                document: document,
-              )));
+          builder: (context) => DetailsDataTugasPage(document: document)));
 }
 
 Color maroon = Colors.red.shade900;

@@ -1,7 +1,10 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddDataKaryawanPage extends StatefulWidget {
   @override
@@ -9,151 +12,188 @@ class AddDataKaryawanPage extends StatefulWidget {
 }
 
 class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
-  final TextEditingController namakaryawan = TextEditingController();
-  final TextEditingController nipkaryawan = TextEditingController();
-  final TextEditingController emailkaryawan = TextEditingController();
-  final TextEditingController jabatankaryawan = TextEditingController();
+  final TextEditingController namaKaryawan = TextEditingController();
+  final TextEditingController idKaryawan = TextEditingController();
+  final TextEditingController emailKaryawan = TextEditingController();
+
+  String selectedRoleKaryawan = 'TKJP';
+
+  List<String> roleOptions = [
+    'Admin',
+    'Approver',
+    'Reviewer',
+    'TKJP',
+  ];
+
+  File? _image;
 
   @override
   Widget build(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
-    double setWidth = deviceWidth * 0.55;
+    double setWidth = deviceWidth;
 
     return Scaffold(
-        appBar: AppBar(title: Text('Tambah Data Karyawan')),
-        body: Container(
-            alignment: Alignment.topLeft,
-            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            height: 500,
-            width: double.infinity,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                boxShadow: [
-                  BoxShadow(
-                      spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
-                ]),
-            child: Column(children: [
-              Row(children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        height: 60,
-                        alignment: Alignment.centerLeft,
-                        child: Text('Nama karyawan',
-                            style: TextStyle(fontSize: 15))),
-                    Container(
-                        height: 60,
-                        alignment: Alignment.centerLeft,
-                        child: Text('NIP karyawan',
-                            style: TextStyle(fontSize: 15))),
-                    Container(
-                        height: 60,
-                        alignment: Alignment.centerLeft,
-                        child: Text('Email Karyawan',
-                            style: TextStyle(fontSize: 15))),
-                    Container(
-                        height: 60,
-                        alignment: Alignment.centerLeft,
-                        child: Text('Jabatan/Bagian',
-                            style: TextStyle(fontSize: 15))),
-                  ],
+      appBar: AppBar(title: Text('Tambah Data Karyawan')),
+      body: Container(
+        alignment: Alignment.topLeft,
+        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
+          ],
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              Center(
+                child: GestureDetector(
+                  onTap: _updateProfilePicture,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundImage: _image != null
+                        ? FileImage(_image!)
+                        : AssetImage('assets/default_profile_picture.png')
+                            as ImageProvider,
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        height: 60,
-                        alignment: Alignment.centerLeft,
-                        child: Text(' :  ', style: TextStyle(fontSize: 15))),
-                    Container(
-                        height: 60,
-                        alignment: Alignment.centerLeft,
-                        child: Text(' :  ', style: TextStyle(fontSize: 15))),
-                    Container(
-                        height: 60,
-                        alignment: Alignment.centerLeft,
-                        child: Text(' :  ', style: TextStyle(fontSize: 15))),
-                    Container(
-                        height: 60,
-                        alignment: Alignment.centerLeft,
-                        child: Text(' :  ', style: TextStyle(fontSize: 15))),
-                  ],
-                ),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  SizedBox(
-                      height: 60,
-                      width: setWidth,
-                      child: TextFormField(
-                        controller: namakaryawan,
-                        textAlignVertical: TextAlignVertical.bottom,
-                        style: TextStyle(fontSize: 16),
-                      )),
-                  SizedBox(
-                      height: 60,
-                      width: setWidth,
-                      child: TextFormField(
-                        controller: nipkaryawan,
-                        textAlignVertical: TextAlignVertical.bottom,
-                        style: TextStyle(fontSize: 16),
-                      )),
-                  SizedBox(
-                      height: 60,
-                      width: setWidth,
-                      child: TextFormField(
-                        controller: emailkaryawan,
-                        textAlignVertical: TextAlignVertical.bottom,
-                        style: TextStyle(fontSize: 16),
-                      )),
-                  SizedBox(
-                      height: 60,
-                      width: setWidth,
-                      child: TextFormField(
-                        controller: jabatankaryawan,
-                        textAlignVertical: TextAlignVertical.bottom,
-                        style: TextStyle(fontSize: 16),
-                      )),
-                ])
-              ]),
-              Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  height: 50,
-                  width: 150,
-                  decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                      border: Border.all(color: Colors.grey.shade700)),
-                  child: GestureDetector(
-                      onTap: () {
-                        _addKaryawan(context);
-                      },
-                      child: Center(
-                          child: Text('Add',
-                              style: TextStyle(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white)))))
-            ])));
+              ),
+              buildTextField('Nama Karyawan', namaKaryawan, setWidth),
+              buildTextField('NO ID', idKaryawan, setWidth),
+              buildTextField('Email Karyawan', emailKaryawan, setWidth),
+              buildDropdown(setWidth),
+              buildButton('Add', Colors.grey, _addKaryawan),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextField(
+      String label, TextEditingController controller, double width,
+      {bool isMultiLine = false}) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        height: 60,
+        alignment: Alignment.centerLeft,
+        child: Text(label, style: TextStyle(fontSize: 18)),
+      ),
+      SizedBox(
+        height: 60,
+        width: width,
+        child: TextFormField(
+          controller: controller,
+          textAlignVertical:
+              isMultiLine ? TextAlignVertical.top : TextAlignVertical.bottom,
+          style: TextStyle(fontSize: 16),
+          maxLines: 1,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget buildDropdown(double width) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        height: 60,
+        alignment: Alignment.centerLeft,
+        child: Text('Role', style: TextStyle(fontSize: 18)),
+      ),
+      SizedBox(
+        height: 60,
+        width: width,
+        child: DropdownButtonFormField(
+          value: selectedRoleKaryawan,
+          items: roleOptions.map((String option) {
+            return DropdownMenuItem(
+              value: option,
+              child: Text(option),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              selectedRoleKaryawan = newValue.toString();
+            });
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget buildButton(String label, Color color, Function onPressed) {
+    return Container(
+      margin: EdgeInsets.all(20),
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      height: 50,
+      width: 150,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+        border: Border.all(color: color),
+      ),
+      child: GestureDetector(
+        onTap: () => onPressed(context),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _addKaryawan(BuildContext context) async {
     try {
-      String nama = namakaryawan.text.trim();
-      String nip = nipkaryawan.text.trim();
-      String email = emailkaryawan.text.trim();
-      String jabatan = jabatankaryawan.text.trim();
+      String nama = namaKaryawan.text.trim();
+      String id = idKaryawan.text.trim();
+      String email = emailKaryawan.text.trim();
+      String role = selectedRoleKaryawan.trim();
+      String password = 'pertamina'; // Set a default password
 
-      if (nama.isNotEmpty) {
-        await FirebaseFirestore.instance.collection('data_karyawan').add({
+      if (nama.isNotEmpty && email.isNotEmpty) {
+        // Create user in Firebase Authentication
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        String uid = userCredential.user!.uid;
+
+        // Upload profile picture to Firebase Storage
+        String? profileImageUrl;
+        if (_image != null) {
+          profileImageUrl = await _uploadImageToFirebase(_image!, uid);
+        }
+
+        // Add user data to Firestore with the UID as the document ID
+        await FirebaseFirestore.instance
+            .collection('data_karyawan')
+            .doc(uid)
+            .set({
           'nama_karyawan': nama,
-          'nip_karyawan': nip,
+          'id_karyawan': id,
           'email_karyawan': email,
-          'jabatan_karyawan': jabatan,
-          'password': hashPassword('pertamina'),
+          'role': role,
+          'profile_picture': profileImageUrl,
         });
+
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Data Karyawan berhasil ditambahkan!'),
           backgroundColor: Colors.green,
@@ -167,17 +207,31 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
         ));
       }
     } catch (e) {
-      print('Error adding stock: $e');
+      print('Error adding karyawan: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('An error occurred. Please try again later.'),
         duration: Duration(seconds: 2),
       ));
     }
   }
-}
 
-String hashPassword(String password) {
-  final bytes = utf8.encode(password); // Convert password to bytes
-  final digest = sha256.convert(bytes); // Hash the password
-  return digest.toString(); // Return the hashed password as a string
+  Future<void> _updateProfilePicture() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<String> _uploadImageToFirebase(File image, String uid) async {
+    String fileName = 'profile_pictures/$uid.jpg';
+    Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
+    UploadTask uploadTask = storageReference.putFile(image);
+    await uploadTask.whenComplete(() => null);
+    String downloadUrl = await storageReference.getDownloadURL();
+    return downloadUrl;
+  }
 }
