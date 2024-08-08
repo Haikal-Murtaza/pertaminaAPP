@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PrivacyPage extends StatefulWidget {
   @override
@@ -7,57 +7,67 @@ class PrivacyPage extends StatefulWidget {
 }
 
 class _PrivacyPageState extends State<PrivacyPage> {
-  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  File? _image;
-
-  // final picker = ImagePicker();
-
-  Future<void> _updateProfilePicture() async {
-    // final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    // if (pickedFile != null) {
-    //   setState(() {
-    //     _image = File(pickedFile.path);
-    //   });
-
-    //   // Upload new profile picture to Firebase Storage and update user document in Firestore
-    //   // (Assume the function _uploadProfilePicture handles the upload and update)
-    //   await _uploadProfilePicture(_image!);
-    // }
-  }
-
-  Future<void> _uploadProfilePicture(File image) async {
-    // Implement upload logic here
-  }
-
-  Future<void> _updateUsername() async {
-    String newUsername = _usernameController.text.trim();
-    if (newUsername.isNotEmpty) {
-      // Update username in Firestore
-      // User? user = FirebaseAuth.instance.currentUser;
-      // await FirebaseFirestore.instance
-      //     .collection('users')
-      //     .doc(user?.uid)
-      //     .update({'username': newUsername});
-    }
-  }
 
   Future<void> _updatePassword() async {
     String newPassword = _passwordController.text.trim();
     if (newPassword.isNotEmpty) {
-      // Update password in Firebase Authentication
-      // User? user = FirebaseAuth.instance.currentUser;
-      // await user?.updatePassword(newPassword);
+      try {
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await user.updatePassword(newPassword);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Password updated successfully')),
+          );
+        }
+      } catch (e) {
+        print('Failed to update password: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update password')),
+        );
+      }
     }
   }
 
   Future<void> _updateEmail() async {
     String newEmail = _emailController.text.trim();
     if (newEmail.isNotEmpty) {
-      // Update email in Firebase Authentication
-      // User? user = FirebaseAuth.instance.currentUser;
-      // await user?.updateEmail(newEmail);
+      try {
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          // Send verification email
+          await user.verifyBeforeUpdateEmail(newEmail);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Verification email sent to $newEmail')),
+          );
+        }
+      } catch (e) {
+        print('Failed to update email: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update email')),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Optionally, prompt the user to re-authenticate
+        // Implement re-authentication here if needed
+
+        await user.delete();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Account deleted successfully')),
+        );
+      }
+    } catch (e) {
+      print('Failed to delete account: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete account')),
+      );
     }
   }
 
@@ -71,32 +81,20 @@ class _PrivacyPageState extends State<PrivacyPage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Center(
-              child: GestureDetector(
-                onTap: _updateProfilePicture,
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: _image != null
-                      ? FileImage(_image!)
-                      : AssetImage('assets/default_profile_picture.png')
-                          as ImageProvider,
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             TextField(
-              controller: _usernameController,
+              controller: _emailController,
               decoration: InputDecoration(
-                labelText: 'Change Username',
+                labelText: 'Change Email',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _updateUsername,
-              child: Text('Update Username'),
+              onPressed: _updateEmail,
+              child: Text('Update Email'),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(
@@ -110,18 +108,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
               onPressed: _updatePassword,
               child: Text('Update Password'),
             ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Change Email',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 10),
+            SizedBox(height: 30),
             ElevatedButton(
-              onPressed: _updateEmail,
-              child: Text('Update Email'),
+              onPressed: _deleteAccount,
+              child: Text('Delete Account'),
             ),
           ],
         ),
