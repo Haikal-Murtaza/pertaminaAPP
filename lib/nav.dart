@@ -22,8 +22,13 @@ void navNotificationPage(BuildContext context) {
       context, MaterialPageRoute(builder: (context) => NotificationsPage()));
 }
 
-void navAdminPage(BuildContext context) {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => AdminPage()));
+void navOtherPage(BuildContext context, String userRole) {
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => OtherPage(
+                userRole: userRole,
+              )));
 }
 
 void navPrivacyPage(BuildContext context) {

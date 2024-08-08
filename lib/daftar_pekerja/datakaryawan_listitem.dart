@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -126,7 +128,7 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                       ? Image.network(widget.document['profile_picture'],
                           fit: BoxFit.cover, height: 130, width: 130)
                       : Image.asset('assets/default_profile_picture.png',
-                          fit: BoxFit.cover, height: 130, width: 130))),
+                          fit: BoxFit.cover, height: 130, width: 130)))
         ]));
   }
 

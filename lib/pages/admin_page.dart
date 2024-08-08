@@ -1,34 +1,49 @@
 import 'package:flutter/material.dart';
 import '../nav.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AdminPage extends StatelessWidget {
+class OtherPage extends StatefulWidget {
+  final String userRole;
+  const OtherPage({required this.userRole});
+
+  @override
+  _OtherPageState createState() => _OtherPageState();
+}
+
+class _OtherPageState extends State<OtherPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Administrator Page'),
+        title: Text('Other Page'),
       ),
-      body: Expanded(
-        child: ListView(
-          children: [
-            GestureDetector(
-              onTap: () {
-                navCompletedTaskPage(context);
-              },
-              child: ListTile(
-                leading: Icon(Icons.task),
-                title: Text('Daftar Tugas Completed'),
-              ),
+      body: ListView(
+        children: [
+          GestureDetector(
+            onTap: () {
+              navCompletedTaskPage(context);
+            },
+            child: ListTile(
+              leading: Icon(Icons.task),
+              title: Text('Daftar Tugas Completed'),
             ),
-            GestureDetector(
-              onTap: () {
-                navApproveTaskPage(context);
-              },
-              child: ListTile(
-                leading: Icon(Icons.approval),
-                title: Text('Daftar Tugas Menunggu Approval'),
-              ),
+          ),
+          GestureDetector(
+            onTap: () {
+              navApproveTaskPage(context);
+            },
+            child: ListTile(
+              leading: Icon(Icons.approval),
+              title: Text('Daftar Tugas Menunggu Approval'),
             ),
+          ),
+          if (widget.userRole == 'Reviewer')
             GestureDetector(
               onTap: () {
                 navReviewTaskPage(context);
@@ -38,6 +53,7 @@ class AdminPage extends StatelessWidget {
                 title: Text('Daftar Tugas Menunggu Review'),
               ),
             ),
+          if (widget.userRole == 'Reviewer')
             GestureDetector(
               onTap: () {
                 navEmployeePage(context);
@@ -47,9 +63,8 @@ class AdminPage extends StatelessWidget {
                 title: Text('Daftar Pekerja'),
               ),
             ),
-            Divider(),
-          ],
-        ),
+          Divider(),
+        ],
       ),
     );
   }

@@ -12,6 +12,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _name;
   String? _employeeNumber;
   String? _profileImageUrl;
+  String? _userRole;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
             _name = userDoc['nama_karyawan'];
             _employeeNumber = userDoc['id_karyawan'];
             _profileImageUrl = userDoc['profile_picture'];
+            _userRole = userDoc['role'];
           });
         }
       }
@@ -73,6 +75,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       Text(
+                        'Role : ${_userRole ?? 'Loading...'}',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
                         'No ID: ${_employeeNumber ?? 'Loading...'}',
                         style: TextStyle(
                           color: Colors.white70,
@@ -95,13 +104,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     navNotificationPage(context);
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.admin_panel_settings),
-                  title: Text('Admin Menu'),
-                  onTap: () {
-                    navAdminPage(context);
-                  },
-                ),
+                // Show this menu item only if the user's role is not 'TKJP'
+                if (_userRole != 'TKJP')
+                  ListTile(
+                    leading: Icon(Icons.admin_panel_settings),
+                    title: Text('Other Menu'),
+                    onTap: () {
+                      navOtherPage(context, _userRole!);
+                    },
+                  ),
                 ListTile(
                   leading: Icon(Icons.lock),
                   title: Text('Privacy'),
@@ -120,7 +131,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ListTile(
                   leading: Icon(Icons.logout),
                   title: Text('Logout'),
-                  onTap: () {
+                  onTap: () async {
+                    // Sign out the user
+                    await FirebaseAuth.instance.signOut();
                     navLogout(context);
                   },
                 ),

@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pertamina_app/nav.dart';
+import 'package:pertamina_app/user_account/login_page.dart';
 
 class PrivacyPage extends StatefulWidget {
   @override
@@ -18,13 +22,46 @@ class _PrivacyPageState extends State<PrivacyPage> {
         if (user != null) {
           await user.updatePassword(newPassword);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Password updated successfully')),
+              SnackBar(content: Text('Password berhasil diupdate')));
+
+          // Sign out the user
+          await FirebaseAuth.instance.signOut();
+
+          // Navigate to the login screen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         }
       } catch (e) {
         print('Failed to update password: $e');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Gagal mengupdate password')));
+      }
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    String newPassword = 'pertamina';
+    if (newPassword.isNotEmpty) {
+      try {
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await user.updatePassword(newPassword);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Password berhasil direset')),
+          );
+          // Sign out the user
+          await FirebaseAuth.instance.signOut();
+
+          // Navigate to the login screen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        }
+      } catch (e) {
+        print('Failed to reset password: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update password')),
+          SnackBar(content: Text('Gagal mereset password')),
         );
       }
     }
@@ -36,86 +73,125 @@ class _PrivacyPageState extends State<PrivacyPage> {
       try {
         User? user = FirebaseAuth.instance.currentUser;
         if (user != null) {
-          // Send verification email
           await user.verifyBeforeUpdateEmail(newEmail);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Verification email sent to $newEmail')),
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  'Verification email telah dikirim tolong konfirmasi untuk mengupdate email address anda')));
+          // Sign out the user
+          await FirebaseAuth.instance.signOut();
+
+          // Navigate to the login screen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         }
       } catch (e) {
         print('Failed to update email: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update email')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Gagal mengupdate email')));
       }
     }
+  }
+
+  void showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text("Confirmation"),
+              content:
+                  const Text("Apakah anda yakin ingin menghapus account anda?"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Cancel")),
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _deleteAccount();
+                    },
+                    child: const Text("Delete"))
+              ]);
+        });
   }
 
   Future<void> _deleteAccount() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // Optionally, prompt the user to re-authenticate
-        // Implement re-authentication here if needed
 
+      if (user != null) {
+        // Get Firestore document reference
+        DocumentReference userDoc = FirebaseFirestore.instance
+            .collection('data_karyawan')
+            .doc(user.uid);
+        DocumentSnapshot document = await userDoc.get();
+
+        String profileImageUrl = document['profile_picture'] ?? '';
+
+        // Delete the user account
         await user.delete();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Account deleted successfully')),
+
+        // Delete profile picture from Firebase Storage
+        if (profileImageUrl.isNotEmpty) {
+          await FirebaseStorage.instance.refFromURL(profileImageUrl).delete();
+        }
+
+        // Delete user data from Firestore
+        await userDoc.delete();
+
+        // Sign out the user
+        await FirebaseAuth.instance.signOut();
+
+        // Navigate to the login screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+              builder: (context) => LoginPage()), // Adjust the route as needed
         );
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Account berhasil dihapus')));
       }
     } catch (e) {
       print('Failed to delete account: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete account')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gagal menghapus account')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Privacy'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            SizedBox(height: 30),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Change Email',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _updateEmail,
-              child: Text('Update Email'),
-            ),
-            SizedBox(height: 30),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Change Password',
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _updatePassword,
-              child: Text('Update Password'),
-            ),
-            SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _deleteAccount,
-              child: Text('Delete Account'),
-            ),
-          ],
-        ),
-      ),
-    );
+        appBar: AppBar(title: Text('Privacy')),
+        body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(children: [
+              SizedBox(height: 30),
+              TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                      labelText: 'Change Email', border: OutlineInputBorder())),
+              SizedBox(height: 10),
+              ElevatedButton(
+                  onPressed: _updateEmail, child: Text('Update Email')),
+              SizedBox(height: 30),
+              TextField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                      labelText: 'Change Password',
+                      border: OutlineInputBorder()),
+                  obscureText: true),
+              SizedBox(height: 15),
+              ElevatedButton(
+                  onPressed: _updatePassword, child: Text('Update Password')),
+              SizedBox(height: 15),
+              ElevatedButton(
+                  onPressed: _resetPassword, child: Text('reset Password')),
+              SizedBox(height: 15),
+              ElevatedButton(
+                  onPressed: () => showDeleteConfirmationDialog(context),
+                  child: Text('Delete Account'))
+            ])));
   }
 }
