@@ -168,14 +168,27 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
           'profile_picture': profileImageUrl,
         });
 
+        if (role == 'Admin') {
+          await FirebaseFirestore.instance
+              .collection('admin')
+              .doc(uid)
+              .set({'password': password});
+        }
+
+        // Fetch admin password from Firestore
+        DocumentSnapshot adminDoc = await FirebaseFirestore.instance
+            .collection('admin')
+            .doc(currentUser!.uid)
+            .get();
+
+        String adminPassword = adminDoc['password'];
+
         // Sign out the newly created user
         await FirebaseAuth.instance.signOut();
 
         // Re-sign in the original admin user
-        if (currentUser != null) {
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-              email: currentUser.email!, password: 'admincontrol');
-        }
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: currentUser.email!, password: adminPassword);
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Data Karyawan berhasil ditambahkan!'),

@@ -196,6 +196,7 @@ class _TugasListPageState extends State<TugasListPage> {
                         color: Colors.orange.shade700,
                         borderRadius: BorderRadius.circular(10)),
                     child: Icon(Icons.delete_outline, color: Colors.white))),
+          SizedBox(width: 15),
           GestureDetector(
               onTap: () {
                 navToDetailsTask(context, document, widget.userRole);

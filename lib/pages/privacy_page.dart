@@ -21,7 +21,23 @@ class _PrivacyPageState extends State<PrivacyPage> {
       try {
         User? user = FirebaseAuth.instance.currentUser;
         if (user != null) {
+          // Update password in Firebase Authentication
           await user.updatePassword(newPassword);
+
+          // Check if the user is an admin
+          DocumentSnapshot userDoc = await FirebaseFirestore.instance
+              .collection('data_karyawan')
+              .doc(user.uid)
+              .get();
+
+          if (userDoc.exists && userDoc['role'] == 'Admin') {
+            // Update password in 'admin' document in Firestore
+            await FirebaseFirestore.instance
+                .collection('admin')
+                .doc(user.uid)
+                .update({'password': newPassword});
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Password berhasil diupdate')));
 
@@ -41,13 +57,30 @@ class _PrivacyPageState extends State<PrivacyPage> {
   }
 
   Future<void> _resetPassword() async {
-    String newPassword = 'pertamina';
+    String defaultPassword = 'pertamina';
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        await user.updatePassword(newPassword);
+        // Reset password in Firebase Authentication
+        await user.updatePassword(defaultPassword);
+
+        // Check if the user is an admin
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('data_karyawan')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists && userDoc['role'] == 'Admin') {
+          // Reset password in 'admin' document in Firestore
+          await FirebaseFirestore.instance
+              .collection('admin')
+              .doc(user.uid)
+              .update({'password': defaultPassword});
+        }
+
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Password berhasil direset')));
+
         // Sign out the user
         await FirebaseAuth.instance.signOut();
 
@@ -124,6 +157,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
         DocumentSnapshot document = await userDoc.get();
 
         String profileImageUrl = document['profile_picture'] ?? '';
+        String role = document['role'] ?? '';
 
         // Delete the user account
         await user.delete();
@@ -135,6 +169,14 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
         // Delete user data from Firestore
         await userDoc.delete();
+
+        // Check if the user is an admin and delete the corresponding admin document
+        if (role == 'Admin') {
+          // Get Firestore document reference for admin
+          DocumentReference adminDoc =
+              FirebaseFirestore.instance.collection('admin').doc(user.uid);
+          await adminDoc.delete();
+        }
 
         // Sign out the user
         await FirebaseAuth.instance.signOut();

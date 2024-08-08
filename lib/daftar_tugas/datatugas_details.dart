@@ -115,7 +115,8 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        if (widget.userRole == 'Reviewer')
+                        if (widget.userRole == 'Reviewer' ||
+                            widget.userRole == 'Admin')
                           buildButton(isEditMode ? 'Save' : 'Edit',
                               Colors.orange, _toggleEditMode),
                         buildButton('Upload', Colors.blue, _uploadDocument)
@@ -128,10 +129,9 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
       {bool isMultiLine = false}) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
-        height: 60,
-        alignment: Alignment.centerLeft,
-        child: Text(label, style: TextStyle(fontSize: 18)),
-      ),
+          height: 60,
+          alignment: Alignment.centerLeft,
+          child: Text(label, style: TextStyle(fontSize: 18))),
       SizedBox(
           height: isMultiLine ? 120 : 60,
           width: width,
