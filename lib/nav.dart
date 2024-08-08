@@ -4,14 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pertamina_app/daftar_pekerja/datakaryawan_details.dart';
 import 'package:pertamina_app/daftar_tugas/datatugas_details.dart';
-import 'package:pertamina_app/pages/approve_task_list_page.dart';
-import 'package:pertamina_app/pages/review_task_list_page.dart';
+import 'package:pertamina_app/daftar_tugas/approve_task_list_page.dart';
+import 'package:pertamina_app/daftar_tugas/review_task_list_page.dart';
 import 'daftar_pekerja/datakaryawan_add.dart';
 import 'daftar_pekerja/datakaryawan_page.dart';
 import 'daftar_tugas/datatugas_add.dart';
 import 'pages/about_page.dart';
 import 'pages/admin_page.dart';
-import 'pages/completed_task_list_page.dart';
+import 'daftar_tugas/completed_task_list_page.dart';
 import 'pages/notification_page.dart';
 import 'pages/privacy_page.dart';
 import 'user_account/login_page.dart';
@@ -23,12 +23,8 @@ void navNotificationPage(BuildContext context) {
 }
 
 void navOtherPage(BuildContext context, String userRole) {
-  Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => OtherPage(
-                userRole: userRole,
-              )));
+  Navigator.push(context,
+      MaterialPageRoute(builder: (context) => OtherPage(userRole: userRole)));
 }
 
 void navPrivacyPage(BuildContext context) {
@@ -85,11 +81,12 @@ void navToAddTask(BuildContext context) {
 }
 
 void navToDetailsTask(
-    BuildContext context, DocumentSnapshot<Object?> document) {
+    BuildContext context, DocumentSnapshot<Object?> document, String userRole) {
   Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => DetailsDataTugasPage(document: document)));
+          builder: (context) =>
+              DetailsDataTugasPage(document: document, userRole: userRole)));
 }
 
 Color maroon = Colors.red.shade900;

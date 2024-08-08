@@ -81,7 +81,7 @@ class _AddDataTugasPage extends State<AddDataTugasPage> {
                   monthOptions, selectedFrekuensi == 'Mingguan'),
               buildTextField('Deskripsi', deskripsi, setWidth,
                   isMultiLine: true),
-              buildButton('Add', Colors.grey, _addKaryawan),
+              buildButton('Add', Colors.grey, _addTugas),
             ],
           ),
         ),
@@ -190,7 +190,7 @@ class _AddDataTugasPage extends State<AddDataTugasPage> {
     );
   }
 
-  void _addKaryawan(BuildContext context) async {
+  void _addTugas(BuildContext context) async {
     try {
       String nama = namaTugas.text.trim();
       String pIc = selectedPIC.trim();

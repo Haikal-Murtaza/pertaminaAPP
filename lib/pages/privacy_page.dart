@@ -29,8 +29,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
           // Navigate to the login screen
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
+              MaterialPageRoute(builder: (context) => LoginPage()));
         }
       } catch (e) {
         print('Failed to update password: $e');
@@ -48,21 +47,18 @@ class _PrivacyPageState extends State<PrivacyPage> {
         if (user != null) {
           await user.updatePassword(newPassword);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Password berhasil direset')),
-          );
+              SnackBar(content: Text('Password berhasil direset')));
           // Sign out the user
           await FirebaseAuth.instance.signOut();
 
           // Navigate to the login screen
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
+              MaterialPageRoute(builder: (context) => LoginPage()));
         }
       } catch (e) {
         print('Failed to reset password: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mereset password')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Gagal mereset password')));
       }
     }
   }
@@ -146,9 +142,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
         // Navigate to the login screen
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-              builder: (context) => LoginPage()), // Adjust the route as needed
-        );
+            MaterialPageRoute(builder: (context) => LoginPage()));
 
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Account berhasil dihapus')));

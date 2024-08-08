@@ -16,6 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String? _name;
   String? _profileImageUrl;
+  late String userRole;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _name = userDoc['nama_karyawan'];
           _profileImageUrl = userDoc['profile_picture'];
+          userRole = userDoc['role'];
         });
       }
     } catch (e) {
@@ -166,9 +168,9 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) => TugasListPage(
                             category:
                                 'Tasks for ${DateFormat('MMMM').format(DateTime(0, index + 1))}',
-                            tasks: 10, // You can set tasks based on your logic
                             month: DateFormat('MMMM')
                                 .format(DateTime(0, index + 1)),
+                            userRole: userRole,
                           ),
                         ),
                       );
@@ -200,7 +202,7 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(
               builder: (context) => TugasListPage(
                 category: name.toUpperCase(),
-                tasks: 0,
+                userRole: userRole,
               ),
             ),
           );
