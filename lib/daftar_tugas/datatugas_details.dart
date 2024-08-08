@@ -266,8 +266,10 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
 
         // Get a reference to the storage bucket
         FirebaseStorage storage = FirebaseStorage.instance;
-        String fileName = widget.document.id;
-        int newStatus = 3;
+
+        // Construct the new file name using the document ID and name_tugas
+        String fileName =
+            "${widget.document.id} - ${widget.document['nama_tugas']}";
 
         print('Uploading file: $fileName');
 
@@ -288,23 +290,21 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             .collection('data_tugas')
             .doc(widget.document.id)
             .update({
-          'status': newStatus,
+          'status': '4',
           'documents': FieldValue.arrayUnion([
             {'name': fileName, 'url': downloadUrl}
           ])
         });
 
-        print('Firestore document updated with new file');
-
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text('Document uploaded and linked to the task successfully!'),
+            content: Text('Document berhasil diupload!'),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 4)));
       } else {
         // User canceled the picker
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('No file selected'), duration: Duration(seconds: 2)));
+            content: Text('Tidak ada file yang dipilih'),
+            duration: Duration(seconds: 2)));
       }
     } catch (e) {
       // Enhanced error logging

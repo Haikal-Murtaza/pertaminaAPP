@@ -1,31 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pertamina_app/nav.dart';
 
-class TugasListPage extends StatefulWidget {
-  final String category;
-  final String month;
-  final String userRole;
-
-  TugasListPage(
-      {required this.category, this.month = '', required this.userRole});
-
+class CompletedTaskListPage extends StatefulWidget {
   @override
-  State<TugasListPage> createState() => _TugasListPageState();
+  State<CompletedTaskListPage> createState() => _CompletedTaskListPageState();
 }
 
-class _TugasListPageState extends State<TugasListPage> {
+class _CompletedTaskListPageState extends State<CompletedTaskListPage> {
   late TextEditingController _searchController;
   String searchQuery = '';
-
-  List<String> status = [
-    'Completed',
-    'Denied',
-    'Progress',
-    'Pending',
-    'Not Completed'
-  ];
 
   @override
   void initState() {
@@ -70,9 +54,7 @@ class _TugasListPageState extends State<TugasListPage> {
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Image.asset('assets/logo.png', width: 40),
-                              Text('Tugas Rutin dan Non Rutin',
-                                  style: TextStyle(fontSize: 17))
+                              Image.asset('assets/logo.png', width: 40)
                             ])),
                     Padding(
                         padding:
@@ -85,11 +67,8 @@ class _TugasListPageState extends State<TugasListPage> {
                               icon: Icon(Icons.keyboard_backspace_outlined,
                                   size: 35, color: Colors.black)),
                           SizedBox(width: 5),
-                          Text(
-                              widget.month.isEmpty
-                                  ? "Kategori ${widget.category}"
-                                  : "Bulan ${widget.month}",
-                              style: TextStyle(fontSize: 16)),
+                          Text('Tugas Completed',
+                              style: TextStyle(fontSize: 17)),
                           Spacer()
                         ]))
                   ])),
@@ -105,18 +84,13 @@ class _TugasListPageState extends State<TugasListPage> {
                       })),
               Expanded(
                   child: StreamBuilder<QuerySnapshot>(
-                      stream: (widget.month.isEmpty
-                          ? FirebaseFirestore.instance
-                              .collection('data_tugas')
-                              .where('kategori_tugas',
-                                  isEqualTo: widget.category)
-                              .snapshots()
-                          : FirebaseFirestore.instance
-                              .collection('data_tugas')
-                              .where('bulanMulai', isEqualTo: widget.month)
-                              .snapshots()),
-                      builder:
-                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      stream: FirebaseFirestore.instance
+                          .collection('data_tugas')
+                          .where('status', whereIn: [
+                        'Completed',
+                      ]).snapshots(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.hasError) {
                           return Center(
                               child: Text('Error: ${snapshot.error}'));
@@ -147,15 +121,7 @@ class _TugasListPageState extends State<TugasListPage> {
                                     columns: _createColumns(),
                                     rows: _createRows(filteredDocuments))));
                       }))
-            ])),
-        floatingActionButton: widget.userRole != 'TKJP'
-            ? FloatingActionButton(
-                onPressed: () {
-                  navToAddTask(context);
-                },
-                tooltip: 'tambah tugas',
-                child: Icon(Icons.add))
-            : null);
+            ])));
   }
 
   List<DataColumn> _createColumns() {
@@ -164,9 +130,9 @@ class _TugasListPageState extends State<TugasListPage> {
       DataColumn(label: Text('Nama Tugas')),
       DataColumn(label: Text('PIC')),
       DataColumn(label: Text('Frekuensi')),
-      if (widget.month.isNotEmpty) DataColumn(label: Text('Kategori')),
+      DataColumn(label: Text('Kategori')),
       DataColumn(label: Text('Status')),
-      DataColumn(label: Text('Aksi'))
+      DataColumn(label: Text('Aksi')),
     ];
   }
 
@@ -180,25 +146,13 @@ class _TugasListPageState extends State<TugasListPage> {
         DataCell(Text(document['nama_tugas'])),
         DataCell(Text(document['pic'])),
         DataCell(Text(document['frekuensi'])),
-        if (widget.month.isNotEmpty) DataCell(Text(document['kategori_tugas'])),
+        DataCell(Text(document['kategori_tugas'])),
         DataCell(Text(document['status'])),
         DataCell(
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          if (widget.userRole != 'TKJP')
-            GestureDetector(
-                onTap: () {
-                  showDeleteConfirmationDialog(context, document);
-                },
-                child: Container(
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                        color: Colors.orange.shade700,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Icon(Icons.delete_outline, color: Colors.white))),
           GestureDetector(
               onTap: () {
-                navToDetailsTask(context, document, widget.userRole);
+                // navToDetailsTask(context, document);
               },
               child: Container(
                   height: 30,
@@ -211,76 +165,5 @@ class _TugasListPageState extends State<TugasListPage> {
         ]))
       ]);
     }).toList();
-  }
-
-  void showDeleteConfirmationDialog(
-      BuildContext context, DocumentSnapshot document) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Text("Konfirmasi"),
-              content: const Text("Apakah anda ingin menghapus data ini ?"),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Batal")),
-                TextButton(
-                    onPressed: () {
-                      deleteDataTugas(document);
-                      Navigator.pop(context);
-                      showDeleteSuccessNotification(context);
-                    },
-                    child: const Text("Hapus"))
-              ]);
-        });
-  }
-
-  void showDeleteSuccessNotification(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Data berhasil dihapus!"),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3)));
-  }
-
-  void deleteDataTugas(DocumentSnapshot document) async {
-    try {
-      // Retrieve the 'documents' array from Firestore
-      List<dynamic> documents = document['documents'];
-
-      // Loop through each document in the 'documents' array
-      for (var doc in documents) {
-        String fileName = doc['name'];
-        String fileUrl = doc['url'];
-
-        // Get a reference to the file in Firebase Storage
-        Reference storageRef = FirebaseStorage.instance.refFromURL(fileUrl);
-
-        // Delete the file from Firebase Storage
-        await storageRef.delete();
-        print("File $fileName deleted from Firebase Storage.");
-      }
-
-      // Delete the task document from Firestore
-      await document.reference.delete();
-      print("Document ${document.id} deleted from Firestore.");
-
-      // Notify the user of successful deletion
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Tugas dan file telah berhasil dihapus.'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
-      ));
-    } catch (e) {
-      print("Error deleting: $e");
-      // Notify the user of the error
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error occurred during deletion: $e'),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ));
-    }
   }
 }

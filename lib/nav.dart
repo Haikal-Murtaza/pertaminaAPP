@@ -10,7 +10,7 @@ import 'daftar_pekerja/datakaryawan_add.dart';
 import 'daftar_pekerja/datakaryawan_page.dart';
 import 'daftar_tugas/datatugas_add.dart';
 import 'pages/about_page.dart';
-import 'pages/admin_page.dart';
+import 'pages/other_page.dart';
 import 'daftar_tugas/completed_task_list_page.dart';
 import 'pages/notification_page.dart';
 import 'pages/privacy_page.dart';

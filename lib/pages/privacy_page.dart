@@ -13,6 +13,7 @@ class PrivacyPage extends StatefulWidget {
 class _PrivacyPageState extends State<PrivacyPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  bool _isObsure = true;
 
   Future<void> _updatePassword() async {
     String newPassword = _passwordController.text.trim();
@@ -41,25 +42,23 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   Future<void> _resetPassword() async {
     String newPassword = 'pertamina';
-    if (newPassword.isNotEmpty) {
-      try {
-        User? user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          await user.updatePassword(newPassword);
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Password berhasil direset')));
-          // Sign out the user
-          await FirebaseAuth.instance.signOut();
-
-          // Navigate to the login screen
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => LoginPage()));
-        }
-      } catch (e) {
-        print('Failed to reset password: $e');
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await user.updatePassword(newPassword);
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Gagal mereset password')));
+            .showSnackBar(SnackBar(content: Text('Password berhasil direset')));
+        // Sign out the user
+        await FirebaseAuth.instance.signOut();
+
+        // Navigate to the login screen
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => LoginPage()));
       }
+    } catch (e) {
+      print('Failed to reset password: $e');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gagal mereset password')));
     }
   }
 
@@ -72,7 +71,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
           await user.verifyBeforeUpdateEmail(newEmail);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
-                  'Verification email telah dikirim tolong konfirmasi untuk mengupdate email address anda')));
+                  'Verification email telah dikirim. Tolong konfirmasi untuk mengupdate email address anda')));
           // Sign out the user
           await FirebaseAuth.instance.signOut();
 
@@ -96,7 +95,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
           return AlertDialog(
               title: const Text("Confirmation"),
               content:
-                  const Text("Apakah anda yakin ingin menghapus account anda?"),
+                  const Text("Apakah anda yakin ingin menghapus akun anda?"),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -145,12 +144,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
             MaterialPageRoute(builder: (context) => LoginPage()));
 
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Account berhasil dihapus')));
+            .showSnackBar(SnackBar(content: Text('Akun berhasil dihapus')));
       }
     } catch (e) {
       print('Failed to delete account: $e');
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Gagal menghapus account')));
+          .showSnackBar(SnackBar(content: Text('Gagal menghapus akun')));
     }
   }
 
@@ -163,25 +162,36 @@ class _PrivacyPageState extends State<PrivacyPage> {
             child: ListView(children: [
               SizedBox(height: 30),
               TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                      labelText: 'Change Email', border: OutlineInputBorder())),
+                controller: _emailController,
+                decoration: InputDecoration(
+                    labelText: 'Change Email', border: OutlineInputBorder()),
+              ),
               SizedBox(height: 10),
               ElevatedButton(
                   onPressed: _updateEmail, child: Text('Update Email')),
               SizedBox(height: 30),
               TextField(
                   controller: _passwordController,
+                  obscureText: _isObsure,
                   decoration: InputDecoration(
-                      labelText: 'Change Password',
-                      border: OutlineInputBorder()),
-                  obscureText: true),
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                          icon: Icon(
+                            _isObsure ? Icons.visibility_off : Icons.visibility,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isObsure = !_isObsure;
+                            });
+                          }))),
               SizedBox(height: 15),
               ElevatedButton(
-                  onPressed: _updatePassword, child: Text('Update Password')),
+                  onPressed: _updatePassword, child: Text('Ganti Password')),
               SizedBox(height: 15),
               ElevatedButton(
-                  onPressed: _resetPassword, child: Text('reset Password')),
+                  onPressed: _resetPassword, child: Text('Reset Password')),
               SizedBox(height: 15),
               ElevatedButton(
                   onPressed: () => showDeleteConfirmationDialog(context),

@@ -33,45 +33,38 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
     double setWidth = deviceWidth;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Tambah Data Karyawan')),
-      body: Container(
-        alignment: Alignment.topLeft,
-        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
-          ],
-        ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: [
-              Center(
-                child: GestureDetector(
-                  onTap: _updateProfilePicture,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: _image != null
-                        ? FileImage(_image!)
-                        : AssetImage('assets/default_profile_picture.png')
-                            as ImageProvider,
-                  ),
-                ),
-              ),
-              buildTextField('Nama Karyawan', namaKaryawan, setWidth),
-              buildTextField('NO ID', idKaryawan, setWidth),
-              buildTextField('Email Karyawan', emailKaryawan, setWidth),
-              buildDropdown(setWidth),
-              buildButton('Add', Colors.grey, _addKaryawan),
-            ],
-          ),
-        ),
-      ),
-    );
+        appBar: AppBar(title: Text('Tambah Data Karyawan')),
+        body: Container(
+            alignment: Alignment.topLeft,
+            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                      spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
+                ]),
+            child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(children: [
+                  Center(
+                      child: GestureDetector(
+                          onTap: _updateProfilePicture,
+                          child: CircleAvatar(
+                              radius: 50,
+                              backgroundImage: _image != null
+                                  ? FileImage(_image!)
+                                  : AssetImage(
+                                          'assets/default_profile_picture.png')
+                                      as ImageProvider))),
+                  buildTextField('Nama Karyawan', namaKaryawan, setWidth),
+                  buildTextField('NO ID', idKaryawan, setWidth),
+                  buildTextField('Email Karyawan', emailKaryawan, setWidth),
+                  buildDropdown(setWidth),
+                  buildButton('Add', Colors.grey, _addKaryawan)
+                ]))));
   }
 
   Widget buildTextField(
@@ -79,83 +72,64 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
       {bool isMultiLine = false}) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
-        height: 60,
-        alignment: Alignment.centerLeft,
-        child: Text(label, style: TextStyle(fontSize: 18)),
-      ),
+          height: 60,
+          alignment: Alignment.centerLeft,
+          child: Text(label, style: TextStyle(fontSize: 18))),
       SizedBox(
-        height: 60,
-        width: width,
-        child: TextFormField(
-          controller: controller,
-          textAlignVertical:
-              isMultiLine ? TextAlignVertical.top : TextAlignVertical.bottom,
-          style: TextStyle(fontSize: 16),
-          maxLines: 1,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-          ),
-        ),
-      ),
+          height: 60,
+          width: width,
+          child: TextFormField(
+              controller: controller,
+              textAlignVertical: isMultiLine
+                  ? TextAlignVertical.top
+                  : TextAlignVertical.bottom,
+              style: TextStyle(fontSize: 16),
+              maxLines: 1,
+              decoration: InputDecoration(border: OutlineInputBorder())))
     ]);
   }
 
   Widget buildDropdown(double width) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
-        height: 60,
-        alignment: Alignment.centerLeft,
-        child: Text('Role', style: TextStyle(fontSize: 18)),
-      ),
+          height: 60,
+          alignment: Alignment.centerLeft,
+          child: Text('Role', style: TextStyle(fontSize: 18))),
       SizedBox(
-        height: 60,
-        width: width,
-        child: DropdownButtonFormField(
-          value: selectedRoleKaryawan,
-          items: roleOptions.map((String option) {
-            return DropdownMenuItem(
-              value: option,
-              child: Text(option),
-            );
-          }).toList(),
-          onChanged: (newValue) {
-            setState(() {
-              selectedRoleKaryawan = newValue.toString();
-            });
-          },
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-          ),
-        ),
-      ),
+          height: 60,
+          width: width,
+          child: DropdownButtonFormField(
+              value: selectedRoleKaryawan,
+              items: roleOptions.map((String option) {
+                return DropdownMenuItem(value: option, child: Text(option));
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  selectedRoleKaryawan = newValue.toString();
+                });
+              },
+              decoration: InputDecoration(border: OutlineInputBorder())))
     ]);
   }
 
   Widget buildButton(String label, Color color, Function onPressed) {
     return Container(
-      margin: EdgeInsets.all(20),
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      height: 50,
-      width: 150,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-        border: Border.all(color: color),
-      ),
-      child: GestureDetector(
-        onTap: () => onPressed(context),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
+        margin: EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        height: 50,
+        width: 150,
+        decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            border: Border.all(color: color)),
+        child: GestureDetector(
+            onTap: () => onPressed(context),
+            child: Center(
+                child: Text(label,
+                    style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)))));
   }
 
   void _addKaryawan(BuildContext context) async {
@@ -164,15 +138,15 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
       String id = idKaryawan.text.trim();
       String email = emailKaryawan.text.trim();
       String role = selectedRoleKaryawan.trim();
-      String password = 'pertamina'; // Set a default password
+      String password = 'pertamina'; // Default password untuk new user
 
       if (nama.isNotEmpty && email.isNotEmpty) {
+        // Save the current admin user
+        User? currentUser = FirebaseAuth.instance.currentUser;
+
         // Create user in Firebase Authentication
-        UserCredential userCredential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
 
         String uid = userCredential.user!.uid;
 
@@ -194,24 +168,30 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
           'profile_picture': profileImageUrl,
         });
 
+        // Sign out the newly created user
+        await FirebaseAuth.instance.signOut();
+
+        // Re-sign in the original admin user
+        if (currentUser != null) {
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: currentUser.email!, password: 'admincontrol');
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Data Karyawan berhasil ditambahkan!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 4),
-        ));
+            content: Text('Data Karyawan berhasil ditambahkan!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 4)));
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Mohon masukkan data yang benar!'),
-          duration: Duration(seconds: 2),
-        ));
+            content: Text('Mohon masukkan data yang benar!'),
+            duration: Duration(seconds: 2)));
       }
     } catch (e) {
       print('Error adding karyawan: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('An error occurred. Please try again later.'),
-        duration: Duration(seconds: 2),
-      ));
+          content: Text('An error occurred. Please try again later.'),
+          duration: Duration(seconds: 2)));
     }
   }
 
