@@ -208,7 +208,7 @@ class _AddDataTugasPage extends State<AddDataTugasPage> {
           'kategori_tugas': kategoriTugas,
           'bulanMulai': bulanMulai,
           'deskripsi': deskripsiTugas,
-          'status': '5',
+          'status': 'Not Completed',
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Data tugas berhasil ditambahkan!'),

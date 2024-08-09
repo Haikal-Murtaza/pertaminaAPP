@@ -107,9 +107,8 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
                       selectedStartMonth,
                       monthOptions,
                       isEditMode &&
-                          (selectedFrekuensi != 'Harian' ||
-                              selectedFrekuensi != 'Mingguan') &&
-                          selectedStartMonth.isNotEmpty),
+                          (selectedFrekuensi != 'Harian' &&
+                              selectedFrekuensi != 'Mingguan')),
                   buildTextField('Deskripsi', deskripsi, setWidth, isEditMode,
                       isMultiLine: true),
                   Row(
@@ -217,7 +216,9 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
       String frekuensiTugas = selectedFrekuensi.trim();
       String kategoriTugas = selectedKategori.trim();
       String bulanMulai =
-          selectedFrekuensi == 'Mingguan' ? '' : selectedStartMonth.trim();
+          selectedFrekuensi == 'Mingguan' || selectedFrekuensi == 'Harian'
+              ? ''
+              : selectedStartMonth.trim();
       String deskripsiTugas = deskripsi.text.trim();
 
       if (nama.isNotEmpty) {
@@ -268,8 +269,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
         FirebaseStorage storage = FirebaseStorage.instance;
 
         // Construct the new file name using the document ID and name_tugas
-        String fileName =
-            "${widget.document.id} - ${widget.document['nama_tugas']}";
+        String fileName = "Dokumen ${widget.document['nama_tugas']}";
 
         print('Uploading file: $fileName');
 
@@ -290,7 +290,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             .collection('data_tugas')
             .doc(widget.document.id)
             .update({
-          'status': '4',
+          'status': 'Pending',
           'documents': FieldValue.arrayUnion([
             {'name': fileName, 'url': downloadUrl}
           ])

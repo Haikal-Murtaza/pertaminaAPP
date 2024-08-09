@@ -6,6 +6,7 @@ import 'package:pertamina_app/daftar_pekerja/datakaryawan_details.dart';
 import 'package:pertamina_app/daftar_tugas/datatugas_details.dart';
 import 'package:pertamina_app/daftar_tugas/approve_task_list_page.dart';
 import 'package:pertamina_app/daftar_tugas/review_task_list_page.dart';
+import 'package:pertamina_app/daftar_tugas/uploaded_docs_task_page.dart';
 import 'daftar_pekerja/datakaryawan_add.dart';
 import 'daftar_pekerja/datakaryawan_page.dart';
 import 'daftar_tugas/datatugas_add.dart';

@@ -23,10 +23,19 @@ dependencies:
   firebase_auth: ^4.20.0
   image_picker: ^0.8.4+3
   file_picker: ^8.0.6
+  flutter_pdfview: ^1.0.0+1
+  path_provider: ^2.1.4
+  permission_handler: ^11.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.10.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"
 
   flutter_lints: ^3.0.0
 
