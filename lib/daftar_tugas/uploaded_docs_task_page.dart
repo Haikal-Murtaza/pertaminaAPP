@@ -4,185 +4,102 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
+import 'package:permission_handler/permission_handler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class UploadedDocsPage extends StatelessWidget {
+class UploadedDocsPage extends StatefulWidget {
   final String taskId;
   final String taskName;
 
   UploadedDocsPage({required this.taskId, required this.taskName});
 
   @override
+  _UploadedDocsPageState createState() => _UploadedDocsPageState();
+}
+
+class _UploadedDocsPageState extends State<UploadedDocsPage> {
+  File? file;
+  String? url;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadFileUrl();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Documents for $taskName'),
+        title: Text('Documents for ${widget.taskName}'),
       ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('data_tugas')
-            .doc(taskId)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return Center(child: Text('No documents uploaded yet.'));
-          }
-
-          var task = snapshot.data!;
-          var docs = task['documents'];
-
-          if (docs is! List<dynamic>) {
-            return ListTile(
-              title: Text('Invalid documents format for this task'),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              var doc = docs[index];
-              if (doc is! Map<String, dynamic>) {
-                return ListTile(
-                  title: Text('Invalid document format'),
-                );
-              }
-
-              String docUrl = doc['url'] ?? '';
-              String docName = doc['name'] ?? getFileName(docUrl);
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListTile(
-                    title: Text(
-                      docName,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      body: Center(
+        child: isLoading
+            ? CircularProgressIndicator()
+            : url != null
+                ? Expanded(
+                    child: PDFView(
+                      filePath: file?.path,
+                      onRender: (_) => setState(() {}),
                     ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.download),
-                      onPressed: () {
-                        downloadFileToStorage(docUrl, docName, context);
-                      },
-                    ),
-                  ),
-                  FutureBuilder<File?>(
-                    future: _downloadFile(docUrl),
-                    builder: (context, fileSnapshot) {
-                      if (fileSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (fileSnapshot.hasError) {
-                        print('File snapshot error: ${fileSnapshot.error}');
-                        return Center(
-                            child: Text('Error: ${fileSnapshot.error}'));
-                      } else if (!fileSnapshot.hasData ||
-                          fileSnapshot.data == null) {
-                        print('File snapshot data is null or empty');
-                        return Center(child: Text('Failed to load PDF'));
-                      } else {
-                        print('PDF file path: ${fileSnapshot.data!.path}');
-                        return SizedBox(
-                          height: 300,
-                          child: PDFView(
-                            filePath: fileSnapshot.data!.path,
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  Divider(),
-                ],
-              );
-            },
-          );
-        },
+                  )
+                : url != null
+                    ? InkWell(
+                        onTap: () async {
+                          if (await canLaunchUrl(url as Uri)) {
+                            await launchUrl(url as Uri);
+                          } else {
+                            Fluttertoast.showToast(
+                              msg: "Could not open the file",
+                              textColor: Colors.red,
+                            );
+                          }
+                        },
+                      )
+                    : Container(
+                        child: Text('No documents available.'),
+                      ),
       ),
     );
   }
 
-  String getFileName(String url) {
-    return Uri.decodeComponent(url.split('/').last.split('?').first);
-  }
-
-  Future<File?> _downloadFile(String url) async {
+  void loadFileUrl() async {
     try {
-      final ref = FirebaseStorage.instance.refFromURL(url);
-      final directory = await getApplicationDocumentsDirectory();
-      final filePath = path.join(directory.path, getFileName(url));
-      final file = File(filePath);
+      // Load the URL and file path from Firestore based on the provided taskId
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('data_tugas')
+          .doc(widget.taskId)
+          .get();
 
-      print('Attempting to download file to: $filePath');
-      await ref.writeToFile(file);
+      if (doc.exists) {
+        var docs = doc['documents'];
 
-      // Ensure the file exists
-      if (await file.exists()) {
-        print('File downloaded successfully: ${file.path}');
-        return file;
-      } else {
-        print('File does not exist after download');
-        return null;
+        if (docs is List && docs.isNotEmpty) {
+          var firstDoc =
+              docs[0]; // Assuming you want to show the first document
+          setState(() {
+            url = firstDoc['url'];
+            file = File(firstDoc['filePath']);
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            url = null;
+            isLoading = false;
+          });
+        }
       }
     } catch (e) {
-      print('Failed to download file: $e');
-      return null;
-    }
-  }
-
-  Future<void> downloadFileToStorage(
-      String url, String fileName, BuildContext context) async {
-    try {
-      // Request storage permission
-      var status = await Permission.storage.request();
-      if (!status.isGranted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Storage permission is required to download files.'),
-        ));
-        return;
-      }
-
-      // Get a reference to the file in Firebase Storage using the URL
-      final ref = FirebaseStorage.instance.refFromURL(url);
-
-      // Get the external storage directory
-      final externalDir = await getExternalStorageDirectory();
-      if (externalDir == null) {
-        print('Could not get external storage directory.');
-        return;
-      }
-
-      // Decode the file name from the URL (important for handling special characters)
-      final decodedFileName = Uri.decodeComponent(fileName);
-      final localFilePath = path.join(externalDir.path, decodedFileName);
-
-      final file = File(localFilePath);
-
-      // Debugging output
-      print('Attempting to download file to: $localFilePath');
-
-      // Download the file
-      await ref.writeToFile(file);
-
-      if (await file.exists()) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('File downloaded to ${file.path}'),
-        ));
-      } else {
-        print('File does not exist after download');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('File download failed. File does not exist.'),
-        ));
-      }
-    } catch (e) {
-      print('Failed to download file: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to download file: $e'),
-      ));
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(
+        msg: "Error $e",
+        textColor: Colors.red,
+      );
     }
   }
 }

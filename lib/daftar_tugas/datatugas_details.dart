@@ -253,8 +253,11 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
 
   Future<void> _uploadDocument() async {
     try {
-      // Pick a file
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      // Pick a file with allowed extensions
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowedExtensions: ['pdf', 'doc'],
+        type: FileType.custom,
+      );
 
       if (result != null) {
         // Get the file
@@ -265,15 +268,20 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
           throw 'File path is null';
         }
 
+        // Get the original file extension
+        String fileExtension = file.extension ?? '';
+        if (fileExtension.isEmpty) {
+          throw 'File extension is missing';
+        }
+
+        // Construct the new file name using the document ID and name_tugas with extension
+        String fileName =
+            "Dokumen ${widget.document['nama_tugas']}.$fileExtension";
+
         // Get a reference to the storage bucket
         FirebaseStorage storage = FirebaseStorage.instance;
 
-        // Construct the new file name using the document ID and name_tugas
-        String fileName = "Dokumen ${widget.document['nama_tugas']}";
-
-        print('Uploading file: $fileName');
-
-        // Upload the file with the new name
+        // Upload the file
         Reference ref = storage.ref().child('documents/$fileName');
         UploadTask uploadTask = ref.putFile(File(file.path!));
 
@@ -283,8 +291,6 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
         // Get the file's download URL
         String downloadUrl = await snapshot.ref.getDownloadURL();
 
-        print('File uploaded, download URL: $downloadUrl');
-
         // Save the file metadata to Firestore and link it with the task
         await FirebaseFirestore.instance
             .collection('data_tugas')
@@ -292,7 +298,11 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             .update({
           'status': 'Pending',
           'documents': FieldValue.arrayUnion([
-            {'name': fileName, 'url': downloadUrl}
+            {
+              'name': fileName,
+              'url': downloadUrl,
+              'filePath': file.path,
+            }
           ])
         });
 
@@ -301,7 +311,6 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             backgroundColor: Colors.green,
             duration: Duration(seconds: 4)));
       } else {
-        // User canceled the picker
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Tidak ada file yang dipilih'),
             duration: Duration(seconds: 2)));
