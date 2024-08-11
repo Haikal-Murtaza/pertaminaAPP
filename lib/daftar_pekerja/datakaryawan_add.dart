@@ -134,29 +134,29 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
 
   void _addKaryawan(BuildContext context) async {
     try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('admin')
+          .doc('default')
+          .get();
       String nama = namaKaryawan.text.trim();
       String id = idKaryawan.text.trim();
       String email = emailKaryawan.text.trim();
       String role = selectedRoleKaryawan.trim();
-      String password = 'pertamina'; // Default password untuk new user
+      String password = doc['default'];
 
       if (nama.isNotEmpty && email.isNotEmpty) {
-        // Save the current admin user
         User? currentUser = FirebaseAuth.instance.currentUser;
 
-        // Create user in Firebase Authentication
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
 
         String uid = userCredential.user!.uid;
 
-        // Upload profile picture to Firebase Storage
         String? profileImageUrl;
         if (_image != null) {
           profileImageUrl = await _uploadImageToFirebase(_image!, uid);
         }
 
-        // Add user data to Firestore with the UID as the document ID
         await FirebaseFirestore.instance
             .collection('data_karyawan')
             .doc(uid)
@@ -164,6 +164,7 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
           'nama_karyawan': nama,
           'id_karyawan': id,
           'email_karyawan': email,
+          'password': password,
           'role': role,
           'profile_picture': profileImageUrl,
         });
@@ -175,7 +176,6 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
               .set({'password': password});
         }
 
-        // Fetch admin password from Firestore
         DocumentSnapshot adminDoc = await FirebaseFirestore.instance
             .collection('admin')
             .doc(currentUser!.uid)
@@ -183,10 +183,8 @@ class _AddDataKaryawanPageState extends State<AddDataKaryawanPage> {
 
         String adminPassword = adminDoc['password'];
 
-        // Sign out the newly created user
         await FirebaseAuth.instance.signOut();
 
-        // Re-sign in the original admin user
         await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: currentUser.email!, password: adminPassword);
 

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,37 +19,35 @@ class _PrivacyPageState extends State<PrivacyPage> {
   bool _isObsure = true;
 
   Future<void> _updatePassword() async {
-    String newPassword = _passwordController.text.trim();
+    String newPassword = hashPassword(_passwordController.text.trim());
     if (newPassword.isNotEmpty) {
       try {
         User? user = FirebaseAuth.instance.currentUser;
         if (user != null) {
-          // Update password in Firebase Authentication
           await user.updatePassword(newPassword);
 
-          // Check if the user is an admin
           DocumentSnapshot userDoc = await FirebaseFirestore.instance
               .collection('data_karyawan')
               .doc(user.uid)
               .get();
 
           if (userDoc.exists && userDoc['role'] == 'Admin') {
-            // Update password in 'admin' document in Firestore
             await FirebaseFirestore.instance
                 .collection('admin')
                 .doc(user.uid)
                 .update({'password': newPassword});
           }
 
+          await FirebaseFirestore.instance
+              .collection('data_karyawan')
+              .doc(user.uid)
+              .update({'password': newPassword});
+
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Password berhasil diupdate')));
 
-          // Sign out the user
           await FirebaseAuth.instance.signOut();
-
-          // Navigate to the login screen
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => LoginPage()));
+          navLogout(context);
         }
       } catch (e) {
         print('Failed to update password: $e');
@@ -57,36 +58,38 @@ class _PrivacyPageState extends State<PrivacyPage> {
   }
 
   Future<void> _resetPassword() async {
-    String defaultPassword = 'pertamina';
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('admin')
+        .doc('default')
+        .get();
+    String defaultPassword = doc['default'];
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Reset password in Firebase Authentication
         await user.updatePassword(defaultPassword);
 
-        // Check if the user is an admin
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('data_karyawan')
             .doc(user.uid)
             .get();
 
         if (userDoc.exists && userDoc['role'] == 'Admin') {
-          // Reset password in 'admin' document in Firestore
           await FirebaseFirestore.instance
               .collection('admin')
               .doc(user.uid)
               .update({'password': defaultPassword});
         }
 
+        await FirebaseFirestore.instance
+            .collection('data_karyawan')
+            .doc(user.uid)
+            .update({'password': defaultPassword});
+
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Password berhasil direset')));
 
-        // Sign out the user
         await FirebaseAuth.instance.signOut();
-
-        // Navigate to the login screen
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LoginPage()));
+        navLogout(context);
       }
     } catch (e) {
       print('Failed to reset password: $e');
@@ -105,13 +108,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
                   'Verification email telah dikirim. Tolong konfirmasi untuk mengupdate email address anda')));
-          // Sign out the user
-          await FirebaseAuth.instance.signOut();
 
-          // Navigate to the login screen
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
+          await FirebaseAuth.instance.signOut();
+          navLogout(context);
         }
       } catch (e) {
         print('Failed to update email: $e');
@@ -150,7 +149,6 @@ class _PrivacyPageState extends State<PrivacyPage> {
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        // Get Firestore document reference
         DocumentReference userDoc = FirebaseFirestore.instance
             .collection('data_karyawan')
             .doc(user.uid);
@@ -159,31 +157,22 @@ class _PrivacyPageState extends State<PrivacyPage> {
         String profileImageUrl = document['profile_picture'] ?? '';
         String role = document['role'] ?? '';
 
-        // Delete the user account
         await user.delete();
 
-        // Delete profile picture from Firebase Storage
         if (profileImageUrl.isNotEmpty) {
           await FirebaseStorage.instance.refFromURL(profileImageUrl).delete();
         }
 
-        // Delete user data from Firestore
         await userDoc.delete();
 
-        // Check if the user is an admin and delete the corresponding admin document
         if (role == 'Admin') {
-          // Get Firestore document reference for admin
           DocumentReference adminDoc =
               FirebaseFirestore.instance.collection('admin').doc(user.uid);
           await adminDoc.delete();
         }
 
-        // Sign out the user
         await FirebaseAuth.instance.signOut();
-
-        // Navigate to the login screen
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LoginPage()));
+        navLogout(context);
 
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Akun berhasil dihapus')));
@@ -195,6 +184,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
     }
   }
 
+  String hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,10 +199,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
             child: ListView(children: [
               SizedBox(height: 30),
               TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                    labelText: 'Change Email', border: OutlineInputBorder()),
-              ),
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                      labelText: 'Change Email', border: OutlineInputBorder())),
               SizedBox(height: 10),
               ElevatedButton(
                   onPressed: _updateEmail, child: Text('Update Email')),
@@ -220,9 +214,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
                       border: OutlineInputBorder(),
                       suffixIcon: IconButton(
                           icon: Icon(
-                            _isObsure ? Icons.visibility_off : Icons.visibility,
-                            size: 20,
-                          ),
+                              _isObsure
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              size: 20),
                           onPressed: () {
                             setState(() {
                               _isObsure = !_isObsure;

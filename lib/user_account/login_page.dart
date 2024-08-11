@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     String email = emailController.text;
-    String password = passwordController.text;
+    String password = hashPassword(passwordController.text);
 
     if (email.isEmpty || password.isEmpty) {
       _showErrorDialog('Tolong isi email dan password');
@@ -30,7 +33,6 @@ class _LoginPageState extends State<LoginPage> {
       User? user = userCredential.user;
 
       if (user != null) {
-        // Get user data from Firestore using the UID
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('data_karyawan')
             .doc(user.uid)
@@ -78,6 +80,12 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text('OK'))
               ]);
         });
+  }
+
+  String hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
   }
 
   @override
