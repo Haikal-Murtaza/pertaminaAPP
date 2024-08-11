@@ -232,36 +232,27 @@ class _TugasListPageState extends State<TugasListPage> {
                     onPressed: () {
                       deleteDataTugas(document);
                       Navigator.pop(context);
-                      showDeleteSuccessNotification(context);
                     },
                     child: const Text("Hapus"))
               ]);
         });
   }
 
-  void showDeleteSuccessNotification(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Data berhasil dihapus!"),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3)));
-  }
-
   void deleteDataTugas(DocumentSnapshot document) async {
     try {
-      // Retrieve the 'documents' array from Firestore
-      List<dynamic> documents = document['documents'];
+      // Retrieve the 'uploadDocument' map from Firestore
+      var uploadDocument = document['uploadDocument'];
 
-      // Loop through each document in the 'documents' array
-      for (var doc in documents) {
-        String fileName = doc['name'];
-        String fileUrl = doc['url'];
+      // Check if 'uploadDocument' is not null and has a non-empty 'url'
+      if (uploadDocument != null && uploadDocument['url'].isNotEmpty) {
+        String fileUrl = uploadDocument['url'];
 
         // Get a reference to the file in Firebase Storage
         Reference storageRef = FirebaseStorage.instance.refFromURL(fileUrl);
 
         // Delete the file from Firebase Storage
         await storageRef.delete();
-        print("File $fileName deleted from Firebase Storage.");
+        print("File deleted from Firebase Storage.");
       }
 
       // Delete the task document from Firestore
@@ -270,7 +261,7 @@ class _TugasListPageState extends State<TugasListPage> {
 
       // Notify the user of successful deletion
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Tugas dan file telah berhasil dihapus.'),
+        content: Text('Data berhasil dihapus!'),
         backgroundColor: Colors.green,
         duration: Duration(seconds: 3),
       ));

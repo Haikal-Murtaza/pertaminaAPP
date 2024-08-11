@@ -4,12 +4,9 @@ class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Notifications'),
-      ),
-      body: Center(
-        child: Text('Notification Settings', style: TextStyle(fontSize: 18)),
-      ),
-    );
+        appBar: AppBar(title: Text('Notifications')),
+        body: Center(
+            child:
+                Text('Notification Settings', style: TextStyle(fontSize: 18))));
   }
 }

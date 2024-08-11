@@ -21,9 +21,7 @@ class _OtherPageState extends State<OtherPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Other Page'),
-        ),
+        appBar: AppBar(title: Text('Other Page')),
         body: ListView(children: [
           GestureDetector(
               onTap: () {

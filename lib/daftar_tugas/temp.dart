@@ -1,173 +1,132 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class PickFileFromFirebase extends StatefulWidget {
-  const PickFileFromFirebase({super.key});
+class UploadedDocsPage extends StatefulWidget {
+  final String taskId;
+  final String taskName;
+
+  UploadedDocsPage({required this.taskId, required this.taskName});
 
   @override
-  _PickFileFromFirebaseState createState() => _PickFileFromFirebaseState();
+  _UploadedDocsPageState createState() => _UploadedDocsPageState();
 }
 
-class _PickFileFromFirebaseState extends State<PickFileFromFirebase> {
-  File? file;
-  String? url;
-  bool isPdf = false;
-  var name;
-  // we have also set to circular progress indicator during waiting time
+class _UploadedDocsPageState extends State<UploadedDocsPage> {
   bool isLoading = false;
+  int? expandedIndex;
+
   @override
   void initState() {
     super.initState();
-    loadFileUrl();
+    loadDocuments();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            MaterialButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              elevation: 4,
-              height: 60,
-              color: Colors.blue,
-              onPressed: () {
-                getFile();
-              },
-              child: const Text(
-                "Upload File",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            // add this two package
-            // pdf viewer for display the pdf file in our app
-            //url launcer is usedr for , if we upload the file link then we have open this from the link as well
-            isLoading
-                ? CircularProgressIndicator()
-                : url != null && isPdf
-                    ? Expanded(
-                        child: PDFView(
-                        filePath: file?.path,
-                        onRender: (_) => setState(() {}),
-                      ))
-                    : url != null
-                        ? InkWell(
-                            onTap: () async {
-                              if (await canLaunch(url!)) {
-                                await launch(url!);
-                              } else {
-                                Fluttertoast.showToast(
-                                  msg: "Could not open the file",
-                                  textColor: Colors.red,
-                                );
-                              }
-                            },
-                          )
-                        : Container(),
-          ],
-        ),
-      ),
-    );
+        appBar: AppBar(title: Text('Documents for ${widget.taskName}')),
+        body: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection('data_tugas')
+                    .doc(widget.taskId)
+                    .get(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return Center(child: Text('No documents available.'));
+                  }
+
+                  var docs = snapshot.data!['documents'] as List<dynamic>;
+
+                  if (docs.isEmpty) {
+                    return Center(child: Text('No documents uploaded yet.'));
+                  }
+
+                  return ListView.builder(
+                      itemCount: docs.length,
+                      itemBuilder: (context, index) {
+                        var doc = docs[index];
+                        String docUrl = doc['url'];
+                        String docName = getFileName(docUrl);
+
+                        return Card(
+                            child: ExpansionTile(
+                                key: Key(index.toString()),
+                                initiallyExpanded: expandedIndex == index,
+                                title: Text(docName,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                                trailing: IconButton(
+                                    icon: Icon(Icons.download),
+                                    onPressed: () async {
+                                      if (await canLaunchUrl(docUrl as Uri)) {
+                                        await launchUrl(docUrl as Uri);
+                                      } else {
+                                        Fluttertoast.showToast(
+                                            msg: "Could not open the file",
+                                            textColor: Colors.red);
+                                      }
+                                    }),
+                                onExpansionChanged: (bool expanded) {
+                                  setState(() {
+                                    expandedIndex = expanded ? index : null;
+                                  });
+                                },
+                                children: [
+                              SizedBox(
+                                  height: 200,
+                                  child: PDFView(
+                                      filePath: doc['filePath'],
+                                      onRender: (_) => setState(() {}))),
+                              Divider(),
+                              SizedBox(
+                                height: 50,
+                                width: 50,
+                                child: Text('Button'),
+                              )
+                            ]));
+                      });
+                }));
   }
 
-  // pick the file
-  getFile() async {
-    FilePickerResult? result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: ['pdf', 'doc']);
-    if (result != null) {
-      File c = File(result.files.single.path.toString());
-      setState(() {
-        file = c;
-        name = result.names.toString();
-        isPdf = result.files.single.extension == 'pdf';
-        url = null;
-        isLoading = true;
-      });
-      uploadFile();
-    }
+  String getFileName(String url) {
+    return Uri.decodeComponent(url.split('/').last.split('?').first);
   }
 
-  // for upload the file
-  uploadFile() async {
-    try {
-      // file is store inside the Users folder in firebase storage
-      var myFile =
-          FirebaseStorage.instance.ref().child("Users").child('/$name');
-      UploadTask task = myFile.putFile(file!);
-      TaskSnapshot snapshot = await task;
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-      // save the url and file path to firestore
-      FirebaseFirestore.instance.collection("users").doc("latestFile").set({
-        "url": downloadUrl,
-        'filePath': file!.path,
-        'isPdf': isPdf,
-      });
-      setState(() {
-        url = downloadUrl;
-        isLoading = false;
-      });
-      print(url);
-      if (url != null && file != null) {
-        // for showing snackbar
-        Fluttertoast.showToast(
-          msg: "Uploaded Successfulley",
-          textColor: Colors.white,
-          backgroundColor: Colors.green,
-        );
-      } else {
-        Fluttertoast.showToast(
-          msg: "Something went wrong",
-          textColor: Colors.red,
-          backgroundColor: Colors.green,
-        );
-      }
-    } on Exception catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        textColor: Colors.red,
-        backgroundColor: Colors.green,
-      );
-    }
-  }
+  void loadDocuments() async {
+    setState(() {
+      isLoading = true;
+    });
 
-  void loadFileUrl() async {
-    // load the url and file path from firestore
     try {
       DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc('latestFile')
+          .collection('data_tugas')
+          .doc(widget.taskId)
           .get();
-      if (doc.exists) {
-        setState(() {
-          url = doc['url'];
-          file = File(doc['filePath']);
-          isPdf = doc['isPdf'];
-        });
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (!doc.exists) {
+        Fluttertoast.showToast(msg: "Task not found", textColor: Colors.red);
       }
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Error $e",
-        textColor: Colors.red,
-      );
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg: "Error $e", textColor: Colors.red);
     }
   }
 }

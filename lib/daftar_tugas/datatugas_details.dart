@@ -118,7 +118,9 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
                             widget.userRole == 'Admin')
                           buildButton(isEditMode ? 'Save' : 'Edit',
                               Colors.orange, _toggleEditMode),
-                        buildButton('Upload', Colors.blue, _uploadDocument)
+                        if (widget.document['status'] == 'Not Completed' ||
+                            widget.document['status'] == 'Ask to Revise')
+                          buildButton('Upload', Colors.blue, _uploadDocument)
                       ])
                 ]))));
   }
@@ -253,57 +255,43 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
 
   Future<void> _uploadDocument() async {
     try {
-      // Pick a file with allowed extensions
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowedExtensions: ['pdf', 'doc'],
-        type: FileType.custom,
-      );
+      FilePickerResult? result = await FilePicker.platform
+          .pickFiles(allowedExtensions: ['pdf', 'doc'], type: FileType.custom);
 
       if (result != null) {
-        // Get the file
         PlatformFile file = result.files.first;
 
-        // Ensure file path is not null
         if (file.path == null) {
           throw 'File path is null';
         }
 
-        // Get the original file extension
         String fileExtension = file.extension ?? '';
         if (fileExtension.isEmpty) {
           throw 'File extension is missing';
         }
 
-        // Construct the new file name using the document ID and name_tugas with extension
         String fileName =
             "Dokumen ${widget.document['nama_tugas']}.$fileExtension";
 
-        // Get a reference to the storage bucket
         FirebaseStorage storage = FirebaseStorage.instance;
 
-        // Upload the file
         Reference ref = storage.ref().child('documents/$fileName');
         UploadTask uploadTask = ref.putFile(File(file.path!));
 
-        // Wait for the upload to complete
         TaskSnapshot snapshot = await uploadTask;
 
-        // Get the file's download URL
         String downloadUrl = await snapshot.ref.getDownloadURL();
 
-        // Save the file metadata to Firestore and link it with the task
         await FirebaseFirestore.instance
             .collection('data_tugas')
             .doc(widget.document.id)
             .update({
           'status': 'Pending',
-          'documents': FieldValue.arrayUnion([
-            {
-              'name': fileName,
-              'url': downloadUrl,
-              'filePath': file.path,
-            }
-          ])
+          'uploadDocument': {
+            'name': fileName,
+            'url': downloadUrl,
+            'filePath': file.path
+          }
         });
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -316,10 +304,8 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             duration: Duration(seconds: 2)));
       }
     } catch (e) {
-      // Enhanced error logging
       print('Error uploading document: $e');
 
-      // Show detailed error message in Snackbar
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
               Text('An error occurred. Please try again later. Details: $e'),

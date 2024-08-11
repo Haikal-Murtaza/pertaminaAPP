@@ -54,7 +54,7 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Image.asset('assets/logo.png', width: 40),
+                              Image.asset('assets/logo.png', width: 40)
                             ])),
                     Padding(
                         padding:
@@ -66,29 +66,23 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  icon: Icon(
-                                    Icons.keyboard_backspace_outlined,
-                                    size: 35,
-                                    color: Colors.black,
-                                  )),
+                                  icon: Icon(Icons.keyboard_backspace_outlined,
+                                      size: 35, color: Colors.black)),
                               Text('Daftar TKJP',
                                   style: TextStyle(fontSize: 20)),
                               SizedBox(width: 50)
                             ]))
                   ])),
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                  onChanged: (value) {
-                    _onSearchChanged();
-                  },
-                ),
-              ),
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                          hintText: 'Search...',
+                          prefixIcon: Icon(Icons.search)),
+                      onChanged: (value) {
+                        _onSearchChanged();
+                      })),
               Expanded(child: KaryawanItem(searchQuery: searchQuery))
             ])),
         floatingActionButton: FloatingActionButton(

@@ -52,140 +52,109 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
     double setWidth = deviceWidth;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Rincian Karyawan')),
-      body: Container(
-        alignment: Alignment.topLeft,
-        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
-          ],
-        ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: [
-              Center(
-                  child: GestureDetector(
-                      onTap: isEditMode ? _updateProfilePicture : null,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage: _image != null
-                            ? FileImage(_image!)
-                            : _profileImageUrl != null
-                                ? NetworkImage(_profileImageUrl!)
-                                : AssetImage(
-                                        'assets/default_profile_picture.png')
-                                    as ImageProvider,
-                      ))),
-              buildTextField(
-                  'Nama Karyawan', namaKaryawan, setWidth, isEditMode),
-              buildTextField('NO ID', idKaryawan, setWidth, isEditMode),
-              buildTextField('Email Karyawan', emailKaryawan, setWidth, false),
-              buildDropdown(setWidth, isEditMode),
-              buildButton(
-                  isEditMode ? 'Save' : 'Edit', Colors.orange, _toggleEditMode),
-            ],
-          ),
-        ),
-      ),
-    );
+        appBar: AppBar(title: Text('Rincian Karyawan')),
+        body: Container(
+            alignment: Alignment.topLeft,
+            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                      spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
+                ]),
+            child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(children: [
+                  Center(
+                      child: GestureDetector(
+                          onTap: isEditMode ? _updateProfilePicture : null,
+                          child: CircleAvatar(
+                              radius: 50,
+                              backgroundImage: _image != null
+                                  ? FileImage(_image!)
+                                  : _profileImageUrl != null
+                                      ? NetworkImage(_profileImageUrl!)
+                                      : AssetImage(
+                                              'assets/default_profile_picture.png')
+                                          as ImageProvider))),
+                  buildTextField(
+                      'Nama Karyawan', namaKaryawan, setWidth, isEditMode),
+                  buildTextField('NO ID', idKaryawan, setWidth, isEditMode),
+                  buildTextField(
+                      'Email Karyawan', emailKaryawan, setWidth, false),
+                  buildDropdown(setWidth, isEditMode),
+                  buildButton(isEditMode ? 'Save' : 'Edit', Colors.orange,
+                      _toggleEditMode)
+                ]))));
   }
 
   Widget buildTextField(String label, TextEditingController controller,
       double width, bool isEditMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
           height: 60,
           alignment: Alignment.centerLeft,
-          child: Text(label, style: TextStyle(fontSize: 18)),
-        ),
-        SizedBox(
+          child: Text(label, style: TextStyle(fontSize: 18))),
+      SizedBox(
           height: 60,
           width: width,
           child: TextFormField(
-            controller: controller,
-            textAlignVertical: TextAlignVertical.bottom,
-            style: TextStyle(fontSize: 16),
-            maxLines: 1,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-            enabled: isEditMode,
-          ),
-        ),
-      ],
-    );
+              controller: controller,
+              textAlignVertical: TextAlignVertical.bottom,
+              style: TextStyle(fontSize: 16),
+              maxLines: 1,
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              enabled: isEditMode))
+    ]);
   }
 
   Widget buildDropdown(double width, bool isEditMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
           height: 60,
           alignment: Alignment.centerLeft,
-          child: Text('Role', style: TextStyle(fontSize: 18)),
-        ),
-        SizedBox(
+          child: Text('Role', style: TextStyle(fontSize: 18))),
+      SizedBox(
           height: 60,
           width: width,
           child: DropdownButtonFormField(
-            value: selectedRoleKaryawan,
-            items: roleOptions.map((String option) {
-              return DropdownMenuItem(
-                value: option,
-                child: Text(option),
-              );
-            }).toList(),
-            onChanged: isEditMode
-                ? (newValue) {
-                    setState(() {
-                      selectedRoleKaryawan = newValue.toString();
-                    });
-                  }
-                : null,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-            disabledHint: Text(selectedRoleKaryawan),
-          ),
-        ),
-      ],
-    );
+              value: selectedRoleKaryawan,
+              items: roleOptions.map((String option) {
+                return DropdownMenuItem(value: option, child: Text(option));
+              }).toList(),
+              onChanged: isEditMode
+                  ? (newValue) {
+                      setState(() {
+                        selectedRoleKaryawan = newValue.toString();
+                      });
+                    }
+                  : null,
+              decoration: InputDecoration(border: OutlineInputBorder()),
+              disabledHint: Text(selectedRoleKaryawan)))
+    ]);
   }
 
   Widget buildButton(String label, Color color, Function onPressed) {
     return Container(
-      margin: EdgeInsets.all(20),
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      height: 50,
-      width: 150,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-        border: Border.all(color: color),
-      ),
-      child: GestureDetector(
-        onTap: () => onPressed(),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
+        margin: EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        height: 50,
+        width: 150,
+        decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            border: Border.all(color: color)),
+        child: GestureDetector(
+            onTap: () => onPressed(),
+            child: Center(
+                child: Text(label,
+                    style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)))));
   }
 
   void _toggleEditMode() {
@@ -210,20 +179,18 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
         'nama_karyawan': namaKaryawan.text,
         'id_karyawan': idKaryawan.text,
         'role': selectedRoleKaryawan,
-        'profile_picture': _profileImageUrl,
+        'profile_picture': _profileImageUrl
       });
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Data Karyawan berhasil diperbarui!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 4),
-      ));
+          content: Text('Data Karyawan berhasil diperbarui!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 4)));
     } catch (e) {
       print('Error updating karyawan: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('An error occurred. Please try again later.'),
-        duration: Duration(seconds: 2),
-      ));
+          content: Text('An error occurred. Please try again later.'),
+          duration: Duration(seconds: 2)));
     }
   }
 

@@ -10,25 +10,20 @@ void main() async {
   runApp(MyApp());
 }
 
-// Main application widget
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Provides MyAppState to the widget tree
     return ChangeNotifierProvider(
-      create: (context) {},
-      child: MaterialApp(
-        title: 'pertamina_app',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Color.fromARGB(255, 230, 120, 87)),
-        ),
-        home: LoginPage(),
-      ),
-    );
+        create: (context) {},
+        child: MaterialApp(
+            title: 'pertamina_app',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+                useMaterial3: true,
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: Color.fromARGB(255, 230, 120, 87))),
+            home: LoginPage()));
   }
 }

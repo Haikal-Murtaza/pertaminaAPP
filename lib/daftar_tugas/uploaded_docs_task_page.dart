@@ -1,10 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,6 +19,7 @@ class UploadedDocsPage extends StatefulWidget {
 class _UploadedDocsPageState extends State<UploadedDocsPage> {
   File? file;
   String? url;
+  String? name;
   bool isLoading = false;
 
   @override
@@ -33,73 +31,98 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Documents for ${widget.taskName}'),
-      ),
-      body: Center(
-        child: isLoading
-            ? CircularProgressIndicator()
-            : url != null
-                ? Expanded(
-                    child: PDFView(
-                      filePath: file?.path,
-                      onRender: (_) => setState(() {}),
-                    ),
-                  )
-                : url != null
-                    ? InkWell(
-                        onTap: () async {
-                          if (await canLaunchUrl(url as Uri)) {
-                            await launchUrl(url as Uri);
-                          } else {
-                            Fluttertoast.showToast(
-                              msg: "Could not open the file",
-                              textColor: Colors.red,
-                            );
-                          }
-                        },
-                      )
-                    : Container(
-                        child: Text('No documents available.'),
-                      ),
-      ),
-    );
+        appBar: AppBar(title: Text(widget.taskName)),
+        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          ListTile(
+              title: Text(
+                  name ??
+                      (url != null
+                          ? getFileName(url!)
+                          : 'No document available'),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              trailing: IconButton(
+                  icon: Icon(Icons.download),
+                  onPressed: () {
+                    // not implemented yet
+                  })),
+          Center(
+              child: isLoading
+                  ? CircularProgressIndicator()
+                  : url != null
+                      ? SizedBox(
+                          height: 600,
+                          width: 380,
+                          child: PDFView(
+                              filePath: file?.path,
+                              onRender: (_) => setState(() {})),
+                        )
+                      : InkWell(
+                          onTap: () async {
+                            if (await canLaunchUrl(Uri.parse(url!))) {
+                              await launchUrl(Uri.parse(url!));
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg: "Tidak dapat menampilkan Pdf",
+                                  textColor: Colors.red);
+                            }
+                          },
+                          child: Text('Pdf tidak tersedia'))),
+          Divider(),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            buildButton('Approve', Colors.green, exit),
+            buildButton('Ask to Revise', Colors.orange, exit)
+          ])
+        ]));
+  }
+
+  Widget buildButton(String label, Color color, Function onPressed) {
+    return Container(
+        margin: EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        height: 50,
+        width: 130,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          border: Border.all(color: color),
+        ),
+        child: GestureDetector(
+            onTap: () => onPressed(),
+            child: Center(
+                child: Text(label,
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)))));
+  }
+
+  String getFileName(String url) {
+    return Uri.decodeComponent(url.split('/').last.split('?').first);
+  }
+
+  void exit() {
+    Navigator.of(context).pop();
   }
 
   void loadFileUrl() async {
     try {
-      // Load the URL and file path from Firestore based on the provided taskId
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('data_tugas')
           .doc(widget.taskId)
           .get();
 
-      if (doc.exists) {
-        var docs = doc['documents'];
-
-        if (docs is List && docs.isNotEmpty) {
-          var firstDoc =
-              docs[0]; // Assuming you want to show the first document
-          setState(() {
-            url = firstDoc['url'];
-            file = File(firstDoc['filePath']);
-            isLoading = false;
-          });
-        } else {
-          setState(() {
-            url = null;
-            isLoading = false;
-          });
-        }
-      }
+      setState(() {
+        var uploadDocument = doc['uploadDocument']; // Assuming it's a Map
+        url = uploadDocument['url'];
+        file = File(uploadDocument['filePath']);
+        name = uploadDocument['name'];
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      Fluttertoast.showToast(
-        msg: "Error $e",
-        textColor: Colors.red,
-      );
+      Fluttertoast.showToast(msg: "Error $e", textColor: Colors.red);
     }
   }
 }

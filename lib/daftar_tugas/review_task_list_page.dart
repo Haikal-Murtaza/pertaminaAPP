@@ -133,7 +133,7 @@ class _ReviewTaskListPageState extends State<ReviewTaskListPage> {
       DataColumn(label: Text('Frekuensi')),
       DataColumn(label: Text('Kategori')),
       DataColumn(label: Text('Status')),
-      DataColumn(label: Text('Aksi')),
+      DataColumn(label: Text('Aksi'))
     ];
   }
 
@@ -153,12 +153,10 @@ class _ReviewTaskListPageState extends State<ReviewTaskListPage> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           GestureDetector(
               onTap: () {
-                // Pass the task document ID to the UploadedDocsPage
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => UploadedDocsPage(
-                          taskId: document.id,
-                          taskName: document['nama_tugas'],
-                        )));
+                        taskId: document.id,
+                        taskName: document['nama_tugas'])));
               },
               child: Container(
                   height: 30,

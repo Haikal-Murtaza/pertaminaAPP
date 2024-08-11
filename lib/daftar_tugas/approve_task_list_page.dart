@@ -67,10 +67,8 @@ class _ApproveTaskListPageState extends State<ApproveTaskListPage> {
                               icon: Icon(Icons.keyboard_backspace_outlined,
                                   size: 35, color: Colors.black)),
                           SizedBox(width: 5),
-                          Text(
-                            'Tugas membutuhkan approval',
-                            style: TextStyle(fontSize: 17),
-                          ),
+                          Text('Tugas membutuhkan approval',
+                              style: TextStyle(fontSize: 17)),
                           Spacer()
                         ]))
                   ])),
@@ -79,9 +77,8 @@ class _ApproveTaskListPageState extends State<ApproveTaskListPage> {
                   child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: 'Search...',
-                        prefixIcon: Icon(Icons.search),
-                      ),
+                          hintText: 'Search...',
+                          prefixIcon: Icon(Icons.search)),
                       onChanged: (value) {
                         _onSearchChanged();
                       })),
