@@ -5,44 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pertamina_app/daftar_tugas/datatugas_page.dart';
 
 class HomePage extends StatefulWidget {
-  final String name;
+  final DocumentSnapshot userData;
 
-  HomePage({required this.name});
+  const HomePage({required this.userData});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  String? _name;
-  String? _profileImageUrl;
-  late String userRole;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserProfile();
-  }
-
-  Future<void> _loadUserProfile() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('data_karyawan')
-            .doc(user.uid)
-            .get();
-        setState(() {
-          _name = userDoc['nama_karyawan'];
-          _profileImageUrl = userDoc['profile_picture'];
-          userRole = userDoc['role'];
-        });
-      }
-    } catch (e) {
-      print('Error loading user profile: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     String today = DateFormat('MMMM dd, yyyy').format(DateTime.now());
@@ -75,7 +46,8 @@ class _HomePageState extends State<HomePage> {
                                   Container(
                                       constraints:
                                           BoxConstraints(maxWidth: 150),
-                                      child: Text('Welcome $_name',
+                                      child: Text(
+                                          'Welcome ${widget.userData['nama_karyawan']}',
                                           style: TextStyle(fontSize: 18),
                                           overflow: TextOverflow.ellipsis)),
                                   Text(today, style: TextStyle(fontSize: 14))
@@ -85,9 +57,11 @@ class _HomePageState extends State<HomePage> {
                                 child: Container(
                                     decoration: BoxDecoration(
                                         image: DecorationImage(
-                                            image: _profileImageUrl != null
-                                                ? NetworkImage(
-                                                    _profileImageUrl!)
+                                            image: widget.userData[
+                                                        'profile_picture'] !=
+                                                    null
+                                                ? NetworkImage(widget.userData[
+                                                    'profile_picture'])
                                                 : AssetImage(
                                                         'assets/default_profile_picture.png')
                                                     as ImageProvider,
@@ -120,7 +94,7 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _buildCard(context, 'SECURITY', Colors.blue),
-                            _buildCard(context, 'ENVIRONTMENT', Colors.green)
+                            _buildCard(context, 'ENVIRONMENT', Colors.green)
                           ]),
                       SizedBox(height: 20),
                       Padding(
@@ -144,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                                                   'Tasks for ${DateFormat('MMMM').format(DateTime(0, index + 1))}',
                                               month: DateFormat('MMMM').format(
                                                   DateTime(0, index + 1)),
-                                              userRole: userRole)));
+                                              userData: widget.userData)));
                                 },
                                 child: Card(
                                     child: Center(
@@ -164,7 +138,9 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => TugasListPage(
-                          category: name.toUpperCase(), userRole: userRole)));
+                          category: name.toUpperCase(),
+                          userData: widget.userData,
+                          month: '')));
             },
             child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
@@ -182,7 +158,7 @@ class _HomePageState extends State<HomePage> {
 
                   int totalTasks = snapshot.data!.docs.length;
                   int completedTasks = snapshot.data!.docs
-                      .where((doc) => doc['status'] == true)
+                      .where((doc) => doc['status'] == 'Completed')
                       .length;
                   double progress =
                       totalTasks > 0 ? completedTasks / totalTasks : 0;
@@ -198,7 +174,9 @@ class _HomePageState extends State<HomePage> {
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 16)),
                                 SizedBox(height: 8),
-                                Text('Tugas: $totalTasks',
+                                Text('Rancangan: $totalTasks',
+                                    style: TextStyle(color: Colors.white)),
+                                Text('Realisasi: $completedTasks',
                                     style: TextStyle(color: Colors.white)),
                                 SizedBox(height: 8),
                                 Row(children: [

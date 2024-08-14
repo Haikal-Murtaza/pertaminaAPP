@@ -97,17 +97,22 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                                       child: Icon(Icons.edit_square,
                                           color: Colors.white))),
                               SizedBox(width: 10),
-                              Container(
-                                  height: 30,
-                                  width: 30,
-                                  decoration: BoxDecoration(
-                                      color: Colors.orange.shade700,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10),
-                                          bottomRight: Radius.circular(10))),
-                                  child: Icon(Icons.library_books_outlined,
-                                      color: Colors.white))
+                              GestureDetector(
+                                  onTap: () {
+                                    navToAttendeeData(context);
+                                  },
+                                  child: Container(
+                                      height: 30,
+                                      width: 30,
+                                      decoration: BoxDecoration(
+                                          color: Colors.orange.shade700,
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                              bottomRight:
+                                                  Radius.circular(10))),
+                                      child: Icon(Icons.library_books_outlined,
+                                          color: Colors.white))),
                             ]))
                   ])),
           Container(

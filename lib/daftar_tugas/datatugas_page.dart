@@ -6,10 +6,10 @@ import 'package:pertamina_app/nav.dart';
 class TugasListPage extends StatefulWidget {
   final String category;
   final String month;
-  final String userRole;
+  final DocumentSnapshot<Object?>? userData;
 
   TugasListPage(
-      {required this.category, this.month = '', required this.userRole});
+      {required this.category, required this.month, required this.userData});
 
   @override
   State<TugasListPage> createState() => _TugasListPageState();
@@ -18,14 +18,6 @@ class TugasListPage extends StatefulWidget {
 class _TugasListPageState extends State<TugasListPage> {
   late TextEditingController _searchController;
   String searchQuery = '';
-
-  List<String> status = [
-    'Completed',
-    'Denied',
-    'Progress',
-    'Pending',
-    'Not Completed'
-  ];
 
   @override
   void initState() {
@@ -148,10 +140,10 @@ class _TugasListPageState extends State<TugasListPage> {
                                     rows: _createRows(filteredDocuments))));
                       }))
             ])),
-        floatingActionButton: widget.userRole != 'TKJP'
+        floatingActionButton: widget.userData?['role'] != 'TKJP'
             ? FloatingActionButton(
                 onPressed: () {
-                  navToAddTask(context);
+                  navToAddTask(context, widget.userData?['nama_karyawan']);
                 },
                 tooltip: 'tambah tugas',
                 child: Icon(Icons.add))
@@ -184,7 +176,7 @@ class _TugasListPageState extends State<TugasListPage> {
         DataCell(Text(document['status'])),
         DataCell(
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          if (widget.userRole != 'TKJP')
+          if (widget.userData?['role'] != 'TKJP')
             GestureDetector(
                 onTap: () {
                   showDeleteConfirmationDialog(context, document);
@@ -199,7 +191,7 @@ class _TugasListPageState extends State<TugasListPage> {
           SizedBox(width: 15),
           GestureDetector(
               onTap: () {
-                navToDetailsTask(context, document, widget.userRole);
+                navToDetailsTask(context, document, widget.userData);
               },
               child: Container(
                   height: 30,
@@ -240,39 +232,39 @@ class _TugasListPageState extends State<TugasListPage> {
 
   void deleteDataTugas(DocumentSnapshot document) async {
     try {
-      // Retrieve the 'uploadDocument' map from Firestore
       var uploadDocument = document['uploadDocument'];
 
-      // Check if 'uploadDocument' is not null and has a non-empty 'url'
       if (uploadDocument != null && uploadDocument['url'].isNotEmpty) {
         String fileUrl = uploadDocument['url'];
 
-        // Get a reference to the file in Firebase Storage
-        Reference storageRef = FirebaseStorage.instance.refFromURL(fileUrl);
-
-        // Delete the file from Firebase Storage
-        await storageRef.delete();
-        print("File deleted from Firebase Storage.");
+        try {
+          Reference storageRef = FirebaseStorage.instance.refFromURL(fileUrl);
+          await storageRef.delete();
+          print("File deleted from Firebase Storage.");
+        } catch (e) {
+          if (e is FirebaseException && e.code == 'object-not-found') {
+            print(
+                "File not found in Firebase Storage, proceeding with deletion.");
+          } else {
+            print("Error deleting file from Firebase Storage: $e");
+            rethrow;
+          }
+        }
       }
 
-      // Delete the task document from Firestore
       await document.reference.delete();
       print("Document ${document.id} deleted from Firestore.");
 
-      // Notify the user of successful deletion
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Data berhasil dihapus!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
-      ));
+          content: Text('Data berhasil dihapus!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3)));
     } catch (e) {
       print("Error deleting: $e");
-      // Notify the user of the error
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error occurred during deletion: $e'),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ));
+          content: Text('Error occurred during deletion: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3)));
     }
   }
 }

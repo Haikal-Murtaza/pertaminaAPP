@@ -5,12 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+// ignore: depend_on_referenced_packages
+import 'package:path/path.dart' as path;
 
 class DetailsDataTugasPage extends StatefulWidget {
   final DocumentSnapshot document;
-  final String userRole;
+  final DocumentSnapshot userData;
 
-  DetailsDataTugasPage({required this.document, required this.userRole});
+  DetailsDataTugasPage({required this.document, required this.userData});
 
   @override
   State<DetailsDataTugasPage> createState() => _DetailsDataTugasPageState();
@@ -86,12 +89,12 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
             width: double.infinity,
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                boxShadow: [
-                  BoxShadow(
-                      spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
-                ]),
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              boxShadow: [
+                BoxShadow(spreadRadius: 0, blurRadius: 4, offset: Offset(0, 1))
+              ],
+            ),
             child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Column(children: [
@@ -114,13 +117,38 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        if (widget.userRole == 'Reviewer' ||
-                            widget.userRole == 'Admin')
+                        if (widget.userData['role'] == 'Reviewer' ||
+                            widget.userData['role'] == 'Admin' &&
+                                widget.document['status'] != 'Completed')
                           buildButton(isEditMode ? 'Save' : 'Edit',
                               Colors.orange, _toggleEditMode),
                         if (widget.document['status'] == 'Not Completed' ||
-                            widget.document['status'] == 'Ask to Revise')
+                            widget.document['status'] == 'Ask to Revise' ||
+                            widget.document['status'] == 'Denied')
                           buildButton('Upload', Colors.blue, _uploadDocument)
+                      ]),
+                  Divider(),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            widget.document['info_buat']['nama'] != ''
+                                ? 'Dibuat oleh: ${widget.document['info_buat']['nama']} pada ${widget.document['info_buat']['tanggal']}'
+                                : 'Dibuat oleh:',
+                            style: TextStyle(fontSize: 18)),
+                        SizedBox(height: 8),
+                        Text(
+                            widget.document['info_upload']['nama'] != ''
+                                ? 'Dikerjakan oleh: ${widget.document['info_upload']['nama']} pada ${widget.document['info_upload']['tanggal']}'
+                                : 'Dikerjakan oleh:',
+                            style: TextStyle(fontSize: 18)),
+                        SizedBox(height: 8),
+                        Text(
+                            widget.document['info_edit']['nama'] != ''
+                                ? 'Terakhir diedit oleh: ${widget.document['info_edit']['nama']} pada ${widget.document['info_edit']['tanggal']}'
+                                : 'Terakhir diedit oleh:',
+                            style: TextStyle(fontSize: 18)),
+                        SizedBox(height: 8)
                       ])
                 ]))));
   }
@@ -233,7 +261,11 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
           'frekuensi': frekuensiTugas,
           'kategori_tugas': kategoriTugas,
           'bulanMulai': bulanMulai,
-          'deskripsi': deskripsiTugas
+          'deskripsi': deskripsiTugas,
+          'info_edit': {
+            'nama': widget.userData['nama_karyawan'],
+            'tanggal': DateFormat('MMMM dd, yyyy').format(DateTime.now())
+          }
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Data tugas berhasil diupdate!'),
@@ -273,6 +305,9 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
         String fileName =
             "Dokumen ${widget.document['nama_tugas']}.$fileExtension";
 
+        Directory downloadDir = Directory('/storage/emulated/0/Download');
+        String filePathInDownloadDir = path.join(downloadDir.path, fileName);
+
         FirebaseStorage storage = FirebaseStorage.instance;
 
         Reference ref = storage.ref().child('documents/$fileName');
@@ -290,7 +325,11 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
           'uploadDocument': {
             'name': fileName,
             'url': downloadUrl,
-            'filePath': file.path
+            'filePath': filePathInDownloadDir,
+            'info_upload': {
+              'nama': widget.userData['nama_karyawan'],
+              'tanggal': DateFormat('MMMM dd, yyyy').format(DateTime.now())
+            }
           }
         });
 

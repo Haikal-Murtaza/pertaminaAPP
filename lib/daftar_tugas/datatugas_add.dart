@@ -1,7 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AddDataTugasPage extends StatefulWidget {
+  final String userName;
+
+  const AddDataTugasPage({required this.userName});
+
   @override
   State<AddDataTugasPage> createState() => _AddDataTugasPage();
 }
@@ -181,11 +186,13 @@ class _AddDataTugasPage extends State<AddDataTugasPage> {
           'bulanMulai': bulanMulai,
           'deskripsi': deskripsiTugas,
           'status': 'Not Completed',
-          'uploadDocument': {
-            'name': '',
-            'url': '',
-            'filePath': ''
-          } 
+          'uploadDocument': {'name': '', 'url': '', 'filePath': ''},
+          'info_buat': {
+            'nama': widget.userName,
+            'tanggal': DateFormat('MMMM dd, yyyy').format(DateTime.now())
+          },
+          'info_edit': {'nama': '', 'tanggal': ''},
+          'info_upload': {'nama': '', 'tanggal': ''}
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Data tugas berhasil ditambahkan!'),

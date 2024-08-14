@@ -151,15 +151,14 @@ class _ApproveTaskListPageState extends State<ApproveTaskListPage> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           GestureDetector(
               onTap: () {
-                // navToDetailsTask(context, document);
+                navToDoc(context, document, 2);
               },
               child: Container(
                   height: 30,
                   width: 30,
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade700,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                      color: Colors.orange.shade700,
+                      borderRadius: BorderRadius.circular(10)),
                   child:
                       Icon(Icons.library_books_outlined, color: Colors.white)))
         ]))

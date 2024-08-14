@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pertamina_app/daftar_tugas/uploaded_docs_task_page.dart';
+import 'package:pertamina_app/nav.dart';
 
 class ReviewTaskListPage extends StatefulWidget {
   @override
@@ -153,10 +154,7 @@ class _ReviewTaskListPageState extends State<ReviewTaskListPage> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           GestureDetector(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => UploadedDocsPage(
-                        taskId: document.id,
-                        taskName: document['nama_tugas'])));
+                navToDoc(context, document, 1);
               },
               child: Container(
                   height: 30,

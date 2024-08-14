@@ -152,7 +152,7 @@ class _CompletedTaskListPageState extends State<CompletedTaskListPage> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           GestureDetector(
               onTap: () {
-                // navToDetailsTask(context, document);
+                navToDoc(context, document, 3);
               },
               child: Container(
                   height: 30,

@@ -1,13 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pertamina_app/pages/attendance_page.dart';
 import 'package:pertamina_app/pages/home_page.dart';
 import 'package:pertamina_app/pages/profile_page.dart';
 
 class NavBar extends StatefulWidget {
-  final String name;
-  final String role;
+  final DocumentSnapshot userData;
 
-  NavBar({required this.name, required this.role});
+  NavBar({required this.userData});
 
   @override
   _NavBarState createState() => _NavBarState();
@@ -18,9 +18,8 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
-    // list bottom bar pages
     final List<Widget> _pages = [
-      HomePage(name: widget.name),
+      HomePage(userData: widget.userData),
       AttendancePage(),
       ProfilePage(),
     ];

@@ -4,7 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pertamina_app/bottomnavbar.dart';
+import 'package:pertamina_app/navbar.dart';
 import 'package:pertamina_app/nav.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _isObsure = true;
+  DocumentSnapshot? userData;
 
   Future<void> _login() async {
     String email = emailController.text;
@@ -39,21 +40,18 @@ class _LoginPageState extends State<LoginPage> {
             .get();
 
         if (userDoc.exists) {
-          var userData = userDoc.data() as Map<String, dynamic>;
-          String name = userData['nama_karyawan'];
-          String role = userData['role'];
+          userData = userDoc;
 
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) => NavBar(name: name, role: role)));
+                  builder: (context) => NavBar(userData: userData!)));
         } else {
           _showErrorDialog(
               'User data not found in Firestore for UID: ${user.uid}');
         }
       }
     } on FirebaseAuthException catch (e) {
-      // Handle Firebase Auth errors
       if (e.code == 'user-not-found') {
         _showErrorDialog('User tidak ditemukan.');
       } else if (e.code == 'wrong-password') {
@@ -62,7 +60,6 @@ class _LoginPageState extends State<LoginPage> {
         _showErrorDialog('Firebase Auth Error: ${e.message}');
       }
     } catch (e) {
-      // Handle other errors
       _showErrorDialog('An error occurred: $e');
     }
   }

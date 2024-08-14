@@ -2,6 +2,7 @@
     package="com.pertamina_parta_niaga_lhokseumawe.pertamina_app">
     
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
 
     <application
         android:label="HSSE Monitoring"

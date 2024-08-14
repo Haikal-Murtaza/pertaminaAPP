@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pertamina_app/daftar_pekerja/datakaryawan_attandee.dart';
 import 'package:pertamina_app/daftar_pekerja/datakaryawan_details.dart';
 import 'package:pertamina_app/daftar_tugas/datatugas_details.dart';
 import 'package:pertamina_app/daftar_tugas/approve_task_list_page.dart';
@@ -58,6 +59,33 @@ void navReviewTaskPage(BuildContext context) {
       context, MaterialPageRoute(builder: (context) => ReviewTaskListPage()));
 }
 
+void navToAddTask(BuildContext context, String userName) {
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => AddDataTugasPage(
+                userName: userName,
+              )));
+}
+
+void navToDetailsTask(
+    BuildContext context, DocumentSnapshot<Object?> document, userData) {
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              DetailsDataTugasPage(document: document, userData: userData)));
+}
+
+void navToDoc(
+    BuildContext context, DocumentSnapshot<Object?> document, int value) {
+  Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => UploadedDocsPage(
+          taskId: document.id,
+          taskName: document['nama_tugas'],
+          value: value)));
+}
+
 void navEmployeePage(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => KaryawanListPage()));
@@ -76,18 +104,9 @@ void navToDetailsKaryawan(
           builder: (context) => DetailsDataKaryawanPage(document: document)));
 }
 
-void navToAddTask(BuildContext context) {
+void navToAttendeeData(BuildContext context) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => AddDataTugasPage()));
-}
-
-void navToDetailsTask(
-    BuildContext context, DocumentSnapshot<Object?> document, String userRole) {
-  Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) =>
-              DetailsDataTugasPage(document: document, userRole: userRole)));
+      context, MaterialPageRoute(builder: (context) => KaryawanAttandeeData()));
 }
 
 Color maroon = Colors.red.shade900;

@@ -12,12 +12,11 @@ class AboutPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('App Name: Your App', style: TextStyle(fontSize: 18)),
+            Text('App Name: HSSE Monitoring APP', style: TextStyle(fontSize: 18)),
             SizedBox(height: 8),
             Text('Version: 1.0.0', style: TextStyle(fontSize: 18)),
             SizedBox(height: 8),
             Text('Developed by: Your Company', style: TextStyle(fontSize: 18)),
-            // Add more details as necessary
           ],
         ),
       ),

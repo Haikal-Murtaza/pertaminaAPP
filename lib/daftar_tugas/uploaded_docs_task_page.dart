@@ -2,15 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UploadedDocsPage extends StatefulWidget {
   final String taskId;
   final String taskName;
+  final int value;
 
-  UploadedDocsPage({required this.taskId, required this.taskName});
+  UploadedDocsPage(
+      {required this.taskId, required this.taskName, required this.value});
 
   @override
   _UploadedDocsPageState createState() => _UploadedDocsPageState();
@@ -30,20 +33,42 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
 
   @override
   Widget build(BuildContext context) {
+    String? label1;
+    String? status1;
+    String? label2;
+    String? status2;
+
+    switch (widget.value) {
+      case 1:
+        label1 = 'Approve';
+        status1 = 'Progress';
+        label2 = 'Ask to Revise';
+        status2 = 'Ask to Revise';
+      case 2:
+        label1 = 'Approve';
+        status1 = 'Completed';
+        label2 = 'Denied';
+        status2 = 'Denied';
+      case 3:
+        label1 = null;
+        label2 = null;
+      default:
+        label1 = 'Approve';
+        status1 = 'Progress';
+        label2 = 'Ask to Revise';
+        status2 = 'Ask to Revise';
+    }
+
     return Scaffold(
         appBar: AppBar(title: Text(widget.taskName)),
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ListTile(
-              title: Text(
-                  name ??
-                      (url != null
-                          ? getFileName(url!)
-                          : 'No document available'),
+              title: Text(name ?? 'No document available',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               trailing: IconButton(
                   icon: Icon(Icons.download),
                   onPressed: () {
-                    // not implemented yet
+                    downloadFile();
                   })),
           Center(
               child: isLoading
@@ -54,23 +79,29 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
                           width: 380,
                           child: PDFView(
                               filePath: file?.path,
-                              onRender: (_) => setState(() {})),
-                        )
+                              onRender: (_) => setState(() {})))
                       : InkWell(
                           onTap: () async {
                             if (await canLaunchUrl(Uri.parse(url!))) {
                               await launchUrl(Uri.parse(url!));
                             } else {
-                              Fluttertoast.showToast(
-                                  msg: "Tidak dapat menampilkan Pdf",
-                                  textColor: Colors.red);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text("Tidak dapat manampilkan Pdf"),
+                                      backgroundColor: Colors.red,
+                                      duration: Duration(seconds: 3)));
                             }
                           },
                           child: Text('Pdf tidak tersedia'))),
           Divider(),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            buildButton('Approve', Colors.green, exit),
-            buildButton('Ask to Revise', Colors.orange, exit)
+            if (label1 != null)
+              buildButton(
+                  label1, Colors.green, () => confirmStatusChange(status1!)),
+            if (label2 != null)
+              buildButton(
+                  label2, Colors.orange, () => confirmStatusChange(status2!))
           ])
         ]));
   }
@@ -96,12 +127,51 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
                         color: Colors.white)))));
   }
 
-  String getFileName(String url) {
-    return Uri.decodeComponent(url.split('/').last.split('?').first);
+  Future<void> confirmStatusChange(String status) async {
+    bool? confirmed = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: Text('Pesan Konfimasi'),
+              content: Text(
+                  'Apakah anda yakin untuk mengubah status tugas menjadi "$status"?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('Batal'),
+                ),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Text('Konfirmasi'))
+              ]);
+        });
+
+    if (confirmed == true) {
+      setStatus(status);
+    }
   }
 
-  void exit() {
-    Navigator.of(context).pop();
+  Future<void> setStatus(String status) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('data_tugas')
+          .doc(widget.taskId)
+          .update({'status': status});
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Failed to update status"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3)));
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Status telah di update'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3)));
+    Navigator.pop(context);
   }
 
   void loadFileUrl() async {
@@ -112,7 +182,7 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
           .get();
 
       setState(() {
-        var uploadDocument = doc['uploadDocument']; // Assuming it's a Map
+        var uploadDocument = doc['uploadDocument'];
         url = uploadDocument['url'];
         file = File(uploadDocument['filePath']);
         name = uploadDocument['name'];
@@ -122,7 +192,46 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
       setState(() {
         isLoading = false;
       });
-      Fluttertoast.showToast(msg: "Error $e", textColor: Colors.red);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Error: $e"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3)));
+    }
+  }
+
+  Future<void> downloadFile() async {
+    var status = await Permission.manageExternalStorage.request();
+    if (status.isGranted) {
+      try {
+        Directory? downloadsDirectory;
+        if (Platform.isAndroid) {
+          downloadsDirectory = Directory('/storage/emulated/0/Download');
+        } else {
+          downloadsDirectory = await getApplicationDocumentsDirectory();
+        }
+        String filePath = "${downloadsDirectory.path}/$name";
+
+        Dio dio = Dio();
+        await dio.download(url!, filePath);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("File downloaded to $filePath"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3)));
+
+        setState(() {
+          loadFileUrl();
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Error: $e"),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3)));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Read External Storage permission denied"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3)));
     }
   }
 }
