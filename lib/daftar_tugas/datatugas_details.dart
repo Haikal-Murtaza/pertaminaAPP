@@ -10,10 +10,10 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 
 class DetailsDataTugasPage extends StatefulWidget {
-  final DocumentSnapshot document;
+  final DocumentSnapshot documentTasks;
   final DocumentSnapshot userData;
 
-  DetailsDataTugasPage({required this.document, required this.userData});
+  DetailsDataTugasPage({required this.documentTasks, required this.userData});
 
   @override
   State<DetailsDataTugasPage> createState() => _DetailsDataTugasPageState();
@@ -67,13 +67,15 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
   @override
   void initState() {
     super.initState();
-    namaTugas = TextEditingController(text: widget.document['nama_tugas']);
-    deskripsi = TextEditingController(text: widget.document['deskripsi']);
+    namaTugas = TextEditingController(text: widget.documentTasks['nama_tugas']);
+    deskripsi = TextEditingController(text: widget.documentTasks['deskripsi']);
 
-    selectedPIC = widget.document['pic'] ?? picOptions[0];
-    selectedFrekuensi = widget.document['frekuensi'] ?? frekuensiOptions[0];
-    selectedKategori = widget.document['kategori_tugas'] ?? kategoriOptions[0];
-    selectedStartMonth = widget.document['bulanMulai'] ?? '';
+    selectedPIC = widget.documentTasks['pic'] ?? picOptions[0];
+    selectedFrekuensi =
+        widget.documentTasks['frekuensi'] ?? frekuensiOptions[0];
+    selectedKategori =
+        widget.documentTasks['kategori_tugas'] ?? kategoriOptions[0];
+    selectedStartMonth = widget.documentTasks['bulanMulai'] ?? '';
   }
 
   @override
@@ -119,12 +121,12 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
                       children: [
                         if (widget.userData['role'] == 'Reviewer' ||
                             widget.userData['role'] == 'Admin' &&
-                                widget.document['status'] != 'Completed')
+                                widget.documentTasks['status'] != 'Completed')
                           buildButton(isEditMode ? 'Save' : 'Edit',
                               Colors.orange, _toggleEditMode),
-                        if (widget.document['status'] == 'Not Completed' ||
-                            widget.document['status'] == 'Ask to Revise' ||
-                            widget.document['status'] == 'Denied')
+                        if (widget.documentTasks['status'] == 'Not Completed' ||
+                            widget.documentTasks['status'] == 'Ask to Revise' ||
+                            widget.documentTasks['status'] == 'Denied')
                           buildButton('Upload', Colors.blue, _uploadDocument)
                       ]),
                   Divider(),
@@ -132,20 +134,20 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                            widget.document['info_buat']['nama'] != ''
-                                ? 'Dibuat oleh: ${widget.document['info_buat']['nama']} pada ${widget.document['info_buat']['tanggal']}'
+                            widget.documentTasks['info_buat']['nama'] != ''
+                                ? 'Dibuat oleh: ${widget.documentTasks['info_buat']['nama']} pada ${widget.documentTasks['info_buat']['tanggal']}'
                                 : 'Dibuat oleh:',
                             style: TextStyle(fontSize: 18)),
                         SizedBox(height: 8),
                         Text(
-                            widget.document['info_upload']['nama'] != ''
-                                ? 'Dikerjakan oleh: ${widget.document['info_upload']['nama']} pada ${widget.document['info_upload']['tanggal']}'
+                            widget.documentTasks['info_upload']['nama'] != ''
+                                ? 'Dikerjakan oleh: ${widget.documentTasks['info_upload']['nama']} pada ${widget.documentTasks['info_upload']['tanggal']}'
                                 : 'Dikerjakan oleh:',
                             style: TextStyle(fontSize: 18)),
                         SizedBox(height: 8),
                         Text(
-                            widget.document['info_edit']['nama'] != ''
-                                ? 'Terakhir diedit oleh: ${widget.document['info_edit']['nama']} pada ${widget.document['info_edit']['tanggal']}'
+                            widget.documentTasks['info_edit']['nama'] != ''
+                                ? 'Terakhir diedit oleh: ${widget.documentTasks['info_edit']['nama']} pada ${widget.documentTasks['info_edit']['tanggal']}'
                                 : 'Terakhir diedit oleh:',
                             style: TextStyle(fontSize: 18)),
                         SizedBox(height: 8)
@@ -254,7 +256,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
       if (nama.isNotEmpty) {
         await FirebaseFirestore.instance
             .collection('data_tugas')
-            .doc(widget.document.id)
+            .doc(widget.documentTasks.id)
             .update({
           'nama_tugas': nama,
           'pic': pIc,
@@ -303,7 +305,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
         }
 
         String fileName =
-            "Dokumen ${widget.document['nama_tugas']}.$fileExtension";
+            "Dokumen ${widget.documentTasks['nama_tugas']}.$fileExtension";
 
         Directory downloadDir = Directory('/storage/emulated/0/Download');
         String filePathInDownloadDir = path.join(downloadDir.path, fileName);
@@ -319,7 +321,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
 
         await FirebaseFirestore.instance
             .collection('data_tugas')
-            .doc(widget.document.id)
+            .doc(widget.documentTasks.id)
             .update({
           'status': 'Pending',
           'uploadDocument': {
@@ -343,7 +345,7 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             duration: Duration(seconds: 2)));
       }
     } catch (e) {
-      print('Error uploading document: $e');
+      print('Error uploading documentTasks: $e');
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:

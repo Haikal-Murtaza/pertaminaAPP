@@ -152,10 +152,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
         DocumentReference userDoc = FirebaseFirestore.instance
             .collection('data_karyawan')
             .doc(user.uid);
-        DocumentSnapshot document = await userDoc.get();
+        DocumentSnapshot documentUser = await userDoc.get();
 
-        String profileImageUrl = document['profile_picture'] ?? '';
-        String role = document['role'] ?? '';
+        String profileImageUrl = documentUser['profile_picture'] ?? '';
+        String role = documentUser['role'] ?? '';
 
         await user.delete();
 

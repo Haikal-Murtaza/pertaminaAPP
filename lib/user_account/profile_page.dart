@@ -4,44 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pertamina_app/nav.dart';
 
 class ProfilePage extends StatefulWidget {
+  final DocumentSnapshot userData;
+
+  const ProfilePage({required this.userData});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String? _name;
-  String? _employeeNumber;
-  String? _profileImageUrl;
-  String? _userRole;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserProfile();
-  }
-
-  Future<void> _loadUserProfile() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('data_karyawan')
-            .doc(user.uid)
-            .get();
-        if (userDoc.exists) {
-          setState(() {
-            _name = userDoc['nama_karyawan'];
-            _employeeNumber = userDoc['id_karyawan'];
-            _profileImageUrl = userDoc['profile_picture'];
-            _userRole = userDoc['role'];
-          });
-        }
-      }
-    } catch (e) {
-      print('Error loading user profile: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,21 +26,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               CircleAvatar(
                 radius: 40,
-                backgroundImage: _profileImageUrl != null
-                    ? NetworkImage(_profileImageUrl!)
+                backgroundImage: widget.userData['profile_picture'] != null
+                    ? NetworkImage(widget.userData['profile_picture']!)
                     : AssetImage('assets/default_profile_picture.png')
                         as ImageProvider,
               ),
               SizedBox(width: 16),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(_name ?? 'Loading...',
+                Text(widget.userData['nama_karyawan'] ?? 'Loading...',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold)),
-                Text('Role : ${_userRole ?? 'Loading...'}',
+                Text('Role : ${widget.userData['role'] ?? 'Loading...'}',
                     style: TextStyle(color: Colors.white70, fontSize: 16)),
-                Text('No ID: ${_employeeNumber ?? 'Loading...'}',
+                Text('No ID: ${widget.userData['id_karyawan'] ?? 'Loading...'}',
                     style: TextStyle(color: Colors.white70, fontSize: 16))
               ])
             ]))
@@ -82,12 +53,13 @@ class _ProfilePageState extends State<ProfilePage> {
             onTap: () {
               navNotificationPage(context);
             }),
-        if (_userRole != 'TKJP' && _userRole != null)
+        if (widget.userData['role'] != 'TKJP' &&
+            widget.userData['role'] != null)
           ListTile(
               leading: Icon(Icons.admin_panel_settings),
               title: Text('Other Menu'),
               onTap: () {
-                navOtherPage(context, _userRole!);
+                navOtherPage(context, widget.userData);
               }),
         ListTile(
             leading: Icon(Icons.lock),
@@ -106,7 +78,6 @@ class _ProfilePageState extends State<ProfilePage> {
             leading: Icon(Icons.logout),
             title: Text('Logout'),
             onTap: () async {
-              // Sign out the user
               await FirebaseAuth.instance.signOut();
               navLogout(context);
             })

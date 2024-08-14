@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'datakaryawan_listitem.dart';
+import 'datakaryawan_list_item.dart';
 
 class KaryawanItem extends StatelessWidget {
   final String searchQuery;
+  final DocumentSnapshot userData;
 
-  const KaryawanItem({required this.searchQuery});
+  const KaryawanItem({required this.searchQuery, required this.userData});
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +34,11 @@ class KaryawanItem extends StatelessWidget {
             return ListView.builder(
                 itemCount: karyawanItems.length,
                 itemBuilder: (context, index) {
-                  DocumentSnapshot document = karyawanItems[index];
-                  return KaryawanListItem(document: document);
+                  DocumentSnapshot documentUsers = karyawanItems[index];
+                  return KaryawanListItem(
+                    documentUsers: documentUsers,
+                    userData: userData,
+                  );
                 });
           }
         });

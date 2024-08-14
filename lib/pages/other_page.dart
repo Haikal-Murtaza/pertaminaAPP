@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OtherPage extends StatefulWidget {
-  final String userRole;
+  final DocumentSnapshot userData;
 
-  const OtherPage({required this.userRole});
+  const OtherPage({required this.userData});
 
   @override
   _OtherPageState createState() => _OtherPageState();
@@ -37,7 +37,8 @@ class _OtherPageState extends State<OtherPage> {
               child: ListTile(
                   leading: Icon(Icons.approval),
                   title: Text('Daftar Tugas Menunggu Approval'))),
-          if (widget.userRole == 'Reviewer' || widget.userRole == 'Admin')
+          if (widget.userData['role'] == 'Reviewer' ||
+              widget.userData['role'] == 'Admin')
             GestureDetector(
                 onTap: () {
                   navReviewTaskPage(context);
@@ -45,10 +46,10 @@ class _OtherPageState extends State<OtherPage> {
                 child: ListTile(
                     leading: Icon(Icons.reviews),
                     title: Text('Daftar Tugas Menunggu Review'))),
-          if (widget.userRole == 'Admin')
+          if (widget.userData['role'] == 'Admin')
             GestureDetector(
                 onTap: () {
-                  navEmployeePage(context);
+                  navEmployeePage(context, widget.userData);
                 },
                 child: ListTile(
                     leading: Icon(Icons.group), title: Text('Daftar Pekerja'))),

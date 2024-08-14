@@ -6,9 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class DetailsDataKaryawanPage extends StatefulWidget {
-  final DocumentSnapshot document;
+  final DocumentSnapshot documentUsers;
 
-  DetailsDataKaryawanPage({required this.document});
+  DetailsDataKaryawanPage({required this.documentUsers});
 
   @override
   State<DetailsDataKaryawanPage> createState() =>
@@ -37,13 +37,14 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
   void initState() {
     super.initState();
     namaKaryawan =
-        TextEditingController(text: widget.document['nama_karyawan']);
-    idKaryawan = TextEditingController(text: widget.document['id_karyawan']);
+        TextEditingController(text: widget.documentUsers['nama_karyawan']);
+    idKaryawan =
+        TextEditingController(text: widget.documentUsers['id_karyawan']);
     emailKaryawan =
-        TextEditingController(text: widget.document['email_karyawan']);
+        TextEditingController(text: widget.documentUsers['email_karyawan']);
 
-    selectedRoleKaryawan = widget.document['role'] ?? roleOptions[3];
-    _profileImageUrl = widget.document['profile_picture'];
+    selectedRoleKaryawan = widget.documentUsers['role'] ?? roleOptions[3];
+    _profileImageUrl = widget.documentUsers['profile_picture'];
   }
 
   @override
@@ -174,7 +175,7 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
 
       await FirebaseFirestore.instance
           .collection('data_karyawan')
-          .doc(widget.document.id)
+          .doc(widget.documentUsers.id)
           .update({
         'nama_karyawan': namaKaryawan.text,
         'id_karyawan': idKaryawan.text,
@@ -206,7 +207,7 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
   }
 
   Future<String> _uploadImageToFirebase(File image) async {
-    String fileName = 'profile_pictures/${widget.document.id}.jpg';
+    String fileName = 'profile_pictures/${widget.documentUsers.id}.jpg';
     Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
     UploadTask uploadTask = storageReference.putFile(image);
     await uploadTask.whenComplete(() => null);

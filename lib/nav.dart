@@ -9,7 +9,7 @@ import 'package:pertamina_app/daftar_tugas/approve_task_list_page.dart';
 import 'package:pertamina_app/daftar_tugas/review_task_list_page.dart';
 import 'package:pertamina_app/daftar_tugas/uploaded_docs_task_page.dart';
 import 'daftar_pekerja/datakaryawan_add.dart';
-import 'daftar_pekerja/datakaryawan_page.dart';
+import 'daftar_pekerja/datakaryawan_list_page.dart';
 import 'daftar_tugas/datatugas_add.dart';
 import 'pages/about_page.dart';
 import 'pages/other_page.dart';
@@ -24,9 +24,9 @@ void navNotificationPage(BuildContext context) {
       context, MaterialPageRoute(builder: (context) => NotificationsPage()));
 }
 
-void navOtherPage(BuildContext context, String userRole) {
+void navOtherPage(BuildContext context, DocumentSnapshot userData) {
   Navigator.push(context,
-      MaterialPageRoute(builder: (context) => OtherPage(userRole: userRole)));
+      MaterialPageRoute(builder: (context) => OtherPage(userData: userData)));
 }
 
 void navPrivacyPage(BuildContext context) {
@@ -69,26 +69,28 @@ void navToAddTask(BuildContext context, String userName) {
 }
 
 void navToDetailsTask(
-    BuildContext context, DocumentSnapshot<Object?> document, userData) {
+    BuildContext context, DocumentSnapshot<Object?> documentTasks, userData) {
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => DetailsDataTugasPage(
+              documentTasks: documentTasks, userData: userData)));
+}
+
+void navToDoc(
+    BuildContext context, DocumentSnapshot<Object?> documentTask, int value) {
   Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) =>
-              DetailsDataTugasPage(document: document, userData: userData)));
+              UploadedDocsPage(documentTask: documentTask, value: value)));
 }
 
-void navToDoc(
-    BuildContext context, DocumentSnapshot<Object?> document, int value) {
-  Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => UploadedDocsPage(
-          taskId: document.id,
-          taskName: document['nama_tugas'],
-          value: value)));
-}
-
-void navEmployeePage(BuildContext context) {
+void navEmployeePage(BuildContext context, DocumentSnapshot<Object?> userData) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => KaryawanListPage()));
+      context,
+      MaterialPageRoute(
+          builder: (context) => KaryawanListPage(userData: userData)));
 }
 
 void navToAdd(BuildContext context) {
@@ -97,16 +99,21 @@ void navToAdd(BuildContext context) {
 }
 
 void navToDetailsKaryawan(
-    BuildContext context, DocumentSnapshot<Object?> document) {
+    BuildContext context, DocumentSnapshot<Object?> documentUsers) {
   Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => DetailsDataKaryawanPage(document: document)));
+          builder: (context) =>
+              DetailsDataKaryawanPage(documentUsers: documentUsers)));
 }
 
-void navToAttendeeData(BuildContext context) {
+void navToAttendeeData(
+    BuildContext context, DocumentSnapshot<Object?> documentUsers) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => KaryawanAttandeeData()));
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              KaryawanAttandeeData(documentUsers: documentUsers)));
 }
 
 Color maroon = Colors.red.shade900;

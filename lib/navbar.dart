@@ -21,7 +21,7 @@ class _NavBarState extends State<NavBar> {
     final List<Widget> _pages = [
       HomePage(userData: widget.userData),
       AttendancePage(),
-      ProfilePage(),
+      ProfilePage(userData: widget.userData),
     ];
 
     void _onItemTapped(int index) {

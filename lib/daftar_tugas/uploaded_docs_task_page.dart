@@ -8,12 +8,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UploadedDocsPage extends StatefulWidget {
-  final String taskId;
-  final String taskName;
+  final DocumentSnapshot documentTask;
   final int value;
 
-  UploadedDocsPage(
-      {required this.taskId, required this.taskName, required this.value});
+  UploadedDocsPage({required this.documentTask, required this.value});
 
   @override
   _UploadedDocsPageState createState() => _UploadedDocsPageState();
@@ -60,7 +58,7 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
     }
 
     return Scaffold(
-        appBar: AppBar(title: Text(widget.taskName)),
+        appBar: AppBar(title: Text(widget.documentTask['nama_tugas'])),
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ListTile(
               title: Text(name ?? 'No document available',
@@ -159,7 +157,7 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
     try {
       await FirebaseFirestore.instance
           .collection('data_tugas')
-          .doc(widget.taskId)
+          .doc(widget.documentTask.id)
           .update({'status': status});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -178,7 +176,7 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
     try {
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('data_tugas')
-          .doc(widget.taskId)
+          .doc(widget.documentTask.id)
           .get();
 
       setState(() {

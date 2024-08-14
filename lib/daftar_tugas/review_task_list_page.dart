@@ -103,11 +103,13 @@ class _ReviewTaskListPageState extends State<ReviewTaskListPage> {
                           return Center(child: CircularProgressIndicator());
                         }
 
-                        final documents = snapshot.data?.docs ?? [];
+                        final documentTasks = snapshot.data?.docs ?? [];
 
-                        final filteredDocuments = documents.where((document) {
-                          final taskName =
-                              document['nama_tugas'].toString().toLowerCase();
+                        final filteredDocuments =
+                            documentTasks.where((documentTask) {
+                          final taskName = documentTask['nama_tugas']
+                              .toString()
+                              .toLowerCase();
                           return taskName.contains(searchQuery.toLowerCase());
                         }).toList();
 
@@ -138,23 +140,23 @@ class _ReviewTaskListPageState extends State<ReviewTaskListPage> {
     ];
   }
 
-  List<DataRow> _createRows(List<QueryDocumentSnapshot> documents) {
-    return documents.asMap().entries.map((entry) {
+  List<DataRow> _createRows(List<QueryDocumentSnapshot> documentTasks) {
+    return documentTasks.asMap().entries.map((entry) {
       int index = entry.key;
-      DocumentSnapshot document = entry.value;
+      DocumentSnapshot documentTask = entry.value;
 
       return DataRow(cells: [
         DataCell(Text((index + 1).toString())),
-        DataCell(Text(document['nama_tugas'])),
-        DataCell(Text(document['pic'])),
-        DataCell(Text(document['frekuensi'])),
-        DataCell(Text(document['kategori_tugas'])),
-        DataCell(Text(document['status'])),
+        DataCell(Text(documentTask['nama_tugas'])),
+        DataCell(Text(documentTask['pic'])),
+        DataCell(Text(documentTask['frekuensi'])),
+        DataCell(Text(documentTask['kategori_tugas'])),
+        DataCell(Text(documentTask['status'])),
         DataCell(
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           GestureDetector(
               onTap: () {
-                navToDoc(context, document, 1);
+                navToDoc(context, documentTask, 1);
               },
               child: Container(
                   height: 30,

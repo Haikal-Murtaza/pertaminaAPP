@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../nav.dart';
 import 'datakaryawan_item.dart';
 
 class KaryawanListPage extends StatefulWidget {
+  final DocumentSnapshot userData;
+
+  const KaryawanListPage({required this.userData});
+
   @override
   State<KaryawanListPage> createState() => _KaryawanListPageState();
 }
@@ -83,7 +88,9 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
                       onChanged: (value) {
                         _onSearchChanged();
                       })),
-              Expanded(child: KaryawanItem(searchQuery: searchQuery))
+              Expanded(
+                  child: KaryawanItem(
+                      searchQuery: searchQuery, userData: widget.userData))
             ])),
         floatingActionButton: FloatingActionButton(
             onPressed: () {

@@ -119,11 +119,13 @@ class _TugasListPageState extends State<TugasListPage> {
                           return Center(child: CircularProgressIndicator());
                         }
 
-                        final documents = snapshot.data?.docs ?? [];
+                        final documentTasks = snapshot.data?.docs ?? [];
 
-                        final filteredDocuments = documents.where((document) {
-                          final taskName =
-                              document['nama_tugas'].toString().toLowerCase();
+                        final filteredDocuments =
+                            documentTasks.where((documentTask) {
+                          final taskName = documentTask['nama_tugas']
+                              .toString()
+                              .toLowerCase();
                           return taskName.contains(searchQuery.toLowerCase());
                         }).toList();
 
@@ -162,24 +164,26 @@ class _TugasListPageState extends State<TugasListPage> {
     ];
   }
 
-  List<DataRow> _createRows(List<QueryDocumentSnapshot> documents) {
-    return documents.asMap().entries.map((entry) {
+  List<DataRow> _createRows(List<QueryDocumentSnapshot> documentTasks) {
+    return documentTasks.asMap().entries.map((entry) {
       int index = entry.key;
-      DocumentSnapshot document = entry.value;
+      DocumentSnapshot documentTask = entry.value;
 
       return DataRow(cells: [
         DataCell(Text((index + 1).toString())),
-        DataCell(Text(document['nama_tugas'])),
-        DataCell(Text(document['pic'])),
-        DataCell(Text(document['frekuensi'])),
-        if (widget.month.isNotEmpty) DataCell(Text(document['kategori_tugas'])),
-        DataCell(Text(document['status'])),
+        DataCell(Text(documentTask['nama_tugas'])),
+        DataCell(Text(documentTask['pic'])),
+        DataCell(Text(documentTask['frekuensi'])),
+        if (widget.month.isNotEmpty)
+          DataCell(Text(documentTask['kategori_tugas'])),
+        DataCell(Text(documentTask['status'])),
         DataCell(
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          if (widget.userData?['role'] != 'TKJP')
+          if (widget.userData?['role'] != 'TKJP' &&
+              widget.userData?['role'] != 'Reviewer')
             GestureDetector(
                 onTap: () {
-                  showDeleteConfirmationDialog(context, document);
+                  showDeleteConfirmationDialog(context, documentTask);
                 },
                 child: Container(
                     height: 30,
@@ -191,7 +195,7 @@ class _TugasListPageState extends State<TugasListPage> {
           SizedBox(width: 15),
           GestureDetector(
               onTap: () {
-                navToDetailsTask(context, document, widget.userData);
+                navToDetailsTask(context, documentTask, widget.userData);
               },
               child: Container(
                   height: 30,
@@ -207,7 +211,7 @@ class _TugasListPageState extends State<TugasListPage> {
   }
 
   void showDeleteConfirmationDialog(
-      BuildContext context, DocumentSnapshot document) {
+      BuildContext context, DocumentSnapshot documentTask) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -222,7 +226,7 @@ class _TugasListPageState extends State<TugasListPage> {
                     child: const Text("Batal")),
                 TextButton(
                     onPressed: () {
-                      deleteDataTugas(document);
+                      deleteDataTugas(documentTask);
                       Navigator.pop(context);
                     },
                     child: const Text("Hapus"))
@@ -230,9 +234,9 @@ class _TugasListPageState extends State<TugasListPage> {
         });
   }
 
-  void deleteDataTugas(DocumentSnapshot document) async {
+  void deleteDataTugas(DocumentSnapshot documentTask) async {
     try {
-      var uploadDocument = document['uploadDocument'];
+      var uploadDocument = documentTask['uploadDocument'];
 
       if (uploadDocument != null && uploadDocument['url'].isNotEmpty) {
         String fileUrl = uploadDocument['url'];
@@ -252,8 +256,8 @@ class _TugasListPageState extends State<TugasListPage> {
         }
       }
 
-      await document.reference.delete();
-      print("Document ${document.id} deleted from Firestore.");
+      await documentTask.reference.delete();
+      print("Document ${documentTask.id} deleted from Firestore.");
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Data berhasil dihapus!'),
