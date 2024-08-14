@@ -15,7 +15,7 @@ import 'pages/about_page.dart';
 import 'pages/other_page.dart';
 import 'daftar_tugas/completed_task_list_page.dart';
 import 'pages/notification_page.dart';
-import 'pages/privacy_page.dart';
+import 'user_account/privacy_page.dart';
 import 'user_account/login_page.dart';
 
 // navigation profile page

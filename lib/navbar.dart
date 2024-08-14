@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:pertamina_app/pages/attendance_page.dart';
+import 'package:pertamina_app/daftar_hadir/attendance_page.dart';
 import 'package:pertamina_app/pages/home_page.dart';
-import 'package:pertamina_app/pages/profile_page.dart';
+import 'package:pertamina_app/user_account/profile_page.dart';
 
 class NavBar extends StatefulWidget {
   final DocumentSnapshot userData;

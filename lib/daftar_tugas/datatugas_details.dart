@@ -326,10 +326,10 @@ class _DetailsDataTugasPageState extends State<DetailsDataTugasPage> {
             'name': fileName,
             'url': downloadUrl,
             'filePath': filePathInDownloadDir,
-            'info_upload': {
-              'nama': widget.userData['nama_karyawan'],
-              'tanggal': DateFormat('MMMM dd, yyyy').format(DateTime.now())
-            }
+          },
+          'info_upload': {
+            'nama': widget.userData['nama_karyawan'],
+            'tanggal': DateFormat('MMMM dd, yyyy').format(DateTime.now())
           }
         });
 

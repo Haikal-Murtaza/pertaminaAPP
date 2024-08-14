@@ -29,7 +29,7 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Attendance'),
+        title: Text('Daftar Kehadiran'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -38,32 +38,31 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
           children: [
             // Dropdown for selecting a staff member
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('data_karyawan')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                }
-                List<DropdownMenuItem<String>> staffItems = snapshot.data!.docs
-                    .map((doc) => DropdownMenuItem<String>(
-                          value: doc.id,
-                          child: Text(doc['nama_karyawan']),
-                        ))
-                    .toList();
+                stream: FirebaseFirestore.instance
+                    .collection('data_karyawan')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return CircularProgressIndicator();
+                  }
+                  List<DropdownMenuItem<String>> staffItems =
+                      snapshot.data!.docs
+                          .map((doc) => DropdownMenuItem<String>(
+                                value: doc.id,
+                                child: Text(doc['nama_karyawan']),
+                              ))
+                          .toList();
 
-                return DropdownButton<String>(
-                  hint: Text('Select Staff Member'),
-                  value: selectedStaffUid,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedStaffUid = value;
-                    });
-                  },
-                  items: staffItems,
-                );
-              },
-            ),
+                  return DropdownButton<String>(
+                      hint: Text('Select Staff Member'),
+                      value: selectedStaffUid,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedStaffUid = value;
+                        });
+                      },
+                      items: staffItems);
+                }),
             SizedBox(height: 16.0),
             // Dropdown for selecting the month
             DropdownButton<String>(
@@ -125,9 +124,8 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
 
   void saveAttendance() async {
     if (selectedStaffUid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please select a staff member.'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please select a staff member.')));
       return;
     }
 
