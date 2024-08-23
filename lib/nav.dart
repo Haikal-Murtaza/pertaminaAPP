@@ -20,9 +20,12 @@ import 'user_account/privacy_page.dart';
 import 'user_account/login_page.dart';
 
 // navigation profile page
-void navNotificationPage(BuildContext context) {
+void navNotificationPage(BuildContext context, String userRole, userId) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => NotificationsPage()));
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              NotificationsPage(userRole: userRole, userId: userId)));
 }
 
 void navOtherPage(BuildContext context, DocumentSnapshot userData) {

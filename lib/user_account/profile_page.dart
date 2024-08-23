@@ -51,7 +51,8 @@ class _ProfilePageState extends State<ProfilePage> {
             leading: Icon(Icons.notifications),
             title: Text('Notifications'),
             onTap: () {
-              navNotificationPage(context);
+              navNotificationPage(
+                  context, widget.userData['role'], widget.userData.id);
             }),
         if (widget.userData['role'] != 'TKJP' &&
             widget.userData['role'] != null)
