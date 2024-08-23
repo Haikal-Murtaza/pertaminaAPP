@@ -20,7 +20,7 @@ class _NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     final List<Widget> _pages = [
       HomePage(userData: widget.userData),
-      AttendancePage(),
+      AttendancePage(userData: widget.userData,),
       ProfilePage(userData: widget.userData),
     ];
 

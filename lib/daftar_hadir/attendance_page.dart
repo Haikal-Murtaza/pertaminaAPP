@@ -1,12 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pertamina_app/daftar_hadir/scanqr.dart';
 
-class AttendancePage extends StatelessWidget {
+class AttendancePage extends StatefulWidget {
+  final DocumentSnapshot userData;
+
+  const AttendancePage({required this.userData});
+  @override
+  _AttendancePageState createState() => _AttendancePageState();
+}
+
+class _AttendancePageState extends State<AttendancePage> {
+  String currentMonth = DateFormat('MMMM yyyy').format(DateTime.now());
+  Map<int, String> attendanceStatus = {};
+  @override
+  void initState() {
+    super.initState();
+    fetchAttendanceData();
+  }
+
+  Future<void> fetchAttendanceData() async {
+    try {
+      String userId = widget.userData.id;
+      String month = DateFormat('MMMM').format(DateTime.now()).toLowerCase();
+
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('attendance')
+          .doc(userId)
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+        List<dynamic>? days = data?[month];
+        if (days != null) {
+          setState(() {
+            for (int i = 0; i < days.length; i++) {
+              attendanceStatus[i + 1] = _getStatusFromValue(days[i]);
+            }
+          });
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error fetching attendance data: $e'),
+          backgroundColor: Colors.red));
+    }
+  }
+
+  String _getStatusFromValue(dynamic value) {
+    switch (value) {
+      case 1:
+        return 'Hadir';
+      case 2:
+        return 'Absent';
+      case 3:
+        return 'Libur';
+      case 4:
+        return 'Cuti';
+      default:
+        return 'Kosong';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    String currentMonth = DateFormat('MMMM yyyy').format(DateTime.now());
-
     return Scaffold(
         appBar: PreferredSize(
             preferredSize: Size.fromHeight(70),
@@ -28,9 +86,7 @@ class AttendancePage extends StatelessWidget {
                           mainAxisSpacing: 6),
                       itemCount: DateTime.now().day,
                       itemBuilder: (context, index) {
-                        DateTime day = DateTime(DateTime.now().year,
-                            DateTime.now().month, index + 1);
-                        String status = _getStatusForDay(day);
+                        String status = attendanceStatus[index + 1] ?? 'blank';
                         return Container(
                             decoration: BoxDecoration(
                               color: _getColorForStatus(status),
@@ -62,7 +118,7 @@ class AttendancePage extends StatelessWidget {
         _buildLegendItem('Hadir', Colors.green),
         _buildLegendItem('Absent', Colors.red),
         _buildLegendItem('Libur', Colors.blue),
-        _buildLegendItem('Izin', Colors.orange),
+        _buildLegendItem('Cuti', Colors.orange),
         _buildLegendItem('kosong', Colors.grey),
       ],
     );
@@ -78,20 +134,15 @@ class AttendancePage extends StatelessWidget {
                 style: TextStyle(color: Colors.white, fontSize: 10))));
   }
 
-  String _getStatusForDay(DateTime day) {
-    // Implement logic to determine status for each day
-    return 'blank';
-  }
-
   Color _getColorForStatus(String status) {
     switch (status) {
-      case 'present':
+      case 'Hadir':
         return Colors.green;
-      case 'absent':
+      case 'Absent':
         return Colors.red;
-      case 'holiday':
+      case 'Libur':
         return Colors.blue;
-      case 'take leave':
+      case 'Cuti':
         return Colors.orange;
       default:
         return Colors.grey;

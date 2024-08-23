@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pertamina_app/daftar_hadir/qr_generate_page.dart';
 import 'package:pertamina_app/daftar_pekerja/datakaryawan_attandee.dart';
 import 'package:pertamina_app/daftar_pekerja/datakaryawan_details.dart';
 import 'package:pertamina_app/daftar_tugas/datatugas_details.dart';
@@ -114,6 +115,11 @@ void navToAttendeeData(
       MaterialPageRoute(
           builder: (context) =>
               KaryawanAttandeeData(documentUsers: documentUsers)));
+}
+
+void navGenQR(BuildContext context) {
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => QrCodeGeneratorPage()));
 }
 
 Color maroon = Colors.red.shade900;

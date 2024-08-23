@@ -21,7 +21,7 @@ class _OtherPageState extends State<OtherPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Other Page')),
+        appBar: AppBar(title: Text('Other Menu')),
         body: ListView(children: [
           GestureDetector(
               onTap: () {
@@ -53,6 +53,15 @@ class _OtherPageState extends State<OtherPage> {
                 },
                 child: ListTile(
                     leading: Icon(Icons.group), title: Text('Daftar Pekerja'))),
+          if (widget.userData['role'] == 'Reviewer' ||
+              widget.userData['role'] == 'Admin')
+            GestureDetector(
+                onTap: () {
+                  navGenQR(context);
+                },
+                child: ListTile(
+                    leading: Icon(Icons.qr_code),
+                    title: Text('Generate Absensi'))),
           Divider()
         ]));
   }

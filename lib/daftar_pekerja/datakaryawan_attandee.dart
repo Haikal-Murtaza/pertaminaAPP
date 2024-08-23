@@ -12,7 +12,7 @@ class KaryawanAttandeeData extends StatefulWidget {
 class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
   String? selectedStaffUid;
   String selectedMonth = 'january';
-  List<bool> attendanceDays = List.generate(31, (index) => false);
+  List<int> attendanceDays = List.generate(31, (index) => 0); // Status codes
   final List<String> months = [
     'january',
     'february',
@@ -27,6 +27,43 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
     'november',
     'december',
   ];
+
+  final Map<int, String> statusLabels = {
+    0: 'Kosong',
+    1: 'Hadir',
+    2: 'Absent',
+    3: 'Libur',
+    4: 'Cuti',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    selectedStaffUid = widget.documentUsers.id;
+    fetchAttendanceData();
+  }
+
+  Future<void> fetchAttendanceData() async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('attendance')
+          .doc(selectedStaffUid)
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+        List<int>? days = List<int>.from(data?[selectedMonth] ?? []);
+        setState(() {
+          attendanceDays =
+              days.length == 31 ? days : List.generate(31, (index) => 0);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error fetching attendance: $e'),
+          backgroundColor: Colors.red));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +81,7 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
                     setState(() {
                       selectedMonth = value!;
                     });
+                    fetchAttendanceData();
                   },
                   items: months
                       .map((month) => DropdownMenuItem(
@@ -57,19 +95,19 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
                       itemCount: attendanceDays.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                attendanceDays[index] = !attendanceDays[index];
-                              });
-                            },
+                            onTap: () => _selectStatus(context, index),
                             child: Container(
                                 margin: EdgeInsets.all(4.0),
                                 decoration: BoxDecoration(
-                                    color: attendanceDays[index]
-                                        ? Colors.green
-                                        : Colors.red,
+                                    color: _getColorForStatus(
+                                        attendanceDays[index]),
                                     borderRadius: BorderRadius.circular(8.0)),
-                                child: Center(child: Text('${index + 1}'))));
+                                child: Center(
+                                    child: Text(
+                                  '${index + 1}\n${statusLabels[attendanceDays[index]]}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white),
+                                ))));
                       })),
               Divider(),
               Align(
@@ -83,26 +121,64 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
   }
 
   Widget _buildLegend() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        _buildLegendItem('Hadir', Colors.green),
-        _buildLegendItem('Absent', Colors.red),
-        _buildLegendItem('Libur', Colors.blue),
-        _buildLegendItem('Izin', Colors.orange),
-        _buildLegendItem('kosong', Colors.grey),
-      ],
-    );
+    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+      _buildLegendItem('Kosong', Colors.grey),
+      _buildLegendItem('Hadir', Colors.green),
+      _buildLegendItem('Absent', Colors.red),
+      _buildLegendItem('Libur', Colors.blue),
+      _buildLegendItem('Cuti', Colors.orange),
+    ]);
   }
 
   Widget _buildLegendItem(String label, Color color) {
     return Container(
-        width: 40,
+        width: 60,
         height: 20,
         color: color,
+        margin: EdgeInsets.only(right: 8.0),
         child: Center(
             child: Text(label,
                 style: TextStyle(color: Colors.white, fontSize: 10))));
+  }
+
+  Future<void> _selectStatus(BuildContext context, int index) async {
+    final selectedStatus = await showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select Status'),
+          children: statusLabels.entries.map((entry) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, entry.key);
+              },
+              child: Text(entry.value),
+            );
+          }).toList(),
+        );
+      },
+    );
+
+    if (selectedStatus != null) {
+      setState(() {
+        attendanceDays[index] = selectedStatus;
+      });
+    }
+  }
+
+  Color _getColorForStatus(int status) {
+    switch (status) {
+      case 1:
+        return Colors.green;
+      case 2:
+        return Colors.red;
+      case 3:
+        return Colors.blue;
+      case 4:
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
   }
 
   void saveAttendance() async {
@@ -117,18 +193,16 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
           .collection('attendance')
           .doc(selectedStaffUid)
           .set({
-        selectedMonth: attendanceDays.map((day) => day ? 1 : 0).toList(),
+        selectedMonth: attendanceDays,
       }, SetOptions(merge: true));
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Attendance saved successfully!'),
-        backgroundColor: Colors.green,
-      ));
+          content: Text('Attendance saved successfully!'),
+          backgroundColor: Colors.green));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error saving attendance: $e'),
-        backgroundColor: Colors.red,
-      ));
+          content: Text('Error saving attendance: $e'),
+          backgroundColor: Colors.red));
     }
   }
 }
