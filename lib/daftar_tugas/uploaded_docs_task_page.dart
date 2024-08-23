@@ -73,7 +73,7 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
                   ? CircularProgressIndicator()
                   : url != null
                       ? SizedBox(
-                          height: 600,
+                          height: 550,
                           width: 380,
                           child: PDFView(
                               filePath: file?.path,
@@ -111,10 +111,9 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
         height: 50,
         width: 130,
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-          border: Border.all(color: color),
-        ),
+            color: color,
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            border: Border.all(color: color)),
         child: GestureDetector(
             onTap: () => onPressed(),
             child: Center(
@@ -135,11 +134,10 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
                   'Apakah anda yakin untuk mengubah status tugas menjadi "$status"?'),
               actions: <Widget>[
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: Text('Batal'),
-                ),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text('Batal')),
                 TextButton(
                     onPressed: () {
                       Navigator.of(context).pop(true);

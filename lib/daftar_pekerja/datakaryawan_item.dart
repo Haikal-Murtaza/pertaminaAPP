@@ -36,9 +36,7 @@ class KaryawanItem extends StatelessWidget {
                 itemBuilder: (context, index) {
                   DocumentSnapshot documentUsers = karyawanItems[index];
                   return KaryawanListItem(
-                    documentUsers: documentUsers,
-                    userData: userData,
-                  );
+                      documentUsers: documentUsers, userData: userData);
                 });
           }
         });

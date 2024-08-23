@@ -30,13 +30,15 @@ class _OtherPageState extends State<OtherPage> {
               child: ListTile(
                   leading: Icon(Icons.task),
                   title: Text('Daftar Tugas Completed'))),
-          GestureDetector(
-              onTap: () {
-                navApproveTaskPage(context);
-              },
-              child: ListTile(
-                  leading: Icon(Icons.approval),
-                  title: Text('Daftar Tugas Menunggu Approval'))),
+          if (widget.userData['role'] == 'Approver' ||
+              widget.userData['role'] == 'Admin')
+            GestureDetector(
+                onTap: () {
+                  navApproveTaskPage(context);
+                },
+                child: ListTile(
+                    leading: Icon(Icons.approval),
+                    title: Text('Daftar Tugas Menunggu Approval'))),
           if (widget.userData['role'] == 'Reviewer' ||
               widget.userData['role'] == 'Admin')
             GestureDetector(
@@ -46,7 +48,8 @@ class _OtherPageState extends State<OtherPage> {
                 child: ListTile(
                     leading: Icon(Icons.reviews),
                     title: Text('Daftar Tugas Menunggu Review'))),
-          if (widget.userData['role'] == 'Admin')
+          if (widget.userData['role'] == 'Reviewer' ||
+              widget.userData['role'] == 'Admin')
             GestureDetector(
                 onTap: () {
                   navEmployeePage(context, widget.userData);

@@ -32,12 +32,14 @@ class _AttendancePageState extends State<AttendancePage> {
 
       if (doc.exists && doc.data() != null) {
         Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-        List<dynamic>? days = data?[month];
+        Map<String, dynamic>? days = data?[month];
+
         if (days != null) {
           setState(() {
-            for (int i = 0; i < days.length; i++) {
-              attendanceStatus[i + 1] = _getStatusFromValue(days[i]);
-            }
+            days.forEach((day, status) {
+              int dayNumber = int.parse(day);
+              attendanceStatus[dayNumber] = _getStatusFromValue(status);
+            });
           });
         }
       }
@@ -89,9 +91,8 @@ class _AttendancePageState extends State<AttendancePage> {
                         String status = attendanceStatus[index + 1] ?? 'blank';
                         return Container(
                             decoration: BoxDecoration(
-                              color: _getColorForStatus(status),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                                color: _getColorForStatus(status),
+                                borderRadius: BorderRadius.circular(8)),
                             child: Center(
                                 child: Text('${index + 1}',
                                     style: TextStyle(color: Colors.white))));
@@ -104,24 +105,22 @@ class _AttendancePageState extends State<AttendancePage> {
               SizedBox(height: 10),
               ElevatedButton(
                   onPressed: () async {
-                    await Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => QRScanPage()));
+                    await Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            QRScanPage(userId: widget.userData.id)));
                   },
                   child: Text('Scan QR'))
             ])));
   }
 
   Widget _buildLegend() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        _buildLegendItem('Hadir', Colors.green),
-        _buildLegendItem('Absent', Colors.red),
-        _buildLegendItem('Libur', Colors.blue),
-        _buildLegendItem('Cuti', Colors.orange),
-        _buildLegendItem('kosong', Colors.grey),
-      ],
-    );
+    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+      _buildLegendItem('Hadir', Colors.green),
+      _buildLegendItem('Absent', Colors.red),
+      _buildLegendItem('Libur', Colors.blue),
+      _buildLegendItem('Cuti', Colors.orange),
+      _buildLegendItem('kosong', Colors.grey)
+    ]);
   }
 
   Widget _buildLegendItem(String label, Color color) {
