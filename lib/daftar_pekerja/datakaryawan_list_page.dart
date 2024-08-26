@@ -83,8 +83,9 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
                   child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                          hintText: 'Search...',
-                          prefixIcon: Icon(Icons.search)),
+                        hintText: 'Search...',
+                        prefixIcon: Icon(Icons.search),
+                      ),
                       onChanged: (value) {
                         _onSearchChanged();
                       })),
@@ -92,11 +93,14 @@ class _KaryawanListPageState extends State<KaryawanListPage> {
                   child: KaryawanItem(
                       searchQuery: searchQuery, userData: widget.userData))
             ])),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              navToAdd(context);
-            },
-            tooltip: 'tambah pekerja',
-            child: Icon(Icons.add)));
+        floatingActionButton: widget.userData['role'] == 'Admin'
+            ? FloatingActionButton(
+                onPressed: () {
+                  navToAdd(context);
+                },
+                tooltip: 'Tambah Pekerja',
+                child: Icon(Icons.add),
+              )
+            : null);
   }
 }

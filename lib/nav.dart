@@ -112,12 +112,14 @@ void navToDetailsKaryawan(
 }
 
 void navToAttendeeData(
-    BuildContext context, DocumentSnapshot<Object?> documentUsers) {
+    BuildContext context, DocumentSnapshot<Object?> documentUsers, userData) {
   Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              KaryawanAttandeeData(documentUsers: documentUsers)));
+          builder: (context) => KaryawanAttandeeData(
+                documentUsers: documentUsers,
+                userData: userData,
+              )));
 }
 
 void navGenQR(BuildContext context) {

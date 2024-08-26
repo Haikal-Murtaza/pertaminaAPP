@@ -210,7 +210,7 @@ class _UploadedDocsPageState extends State<UploadedDocsPage> {
         Dio dio = Dio();
         await dio.download(url!, filePath);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("File downloaded to $filePath"),
+            content: Text("File berhasil didownload pada $filePath"),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 3)));
 

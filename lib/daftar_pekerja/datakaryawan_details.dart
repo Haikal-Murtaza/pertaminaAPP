@@ -25,6 +25,7 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
   String? _profileImageUrl;
 
   bool isEditMode = false;
+  bool isAdmin = false;
 
   List<String> roleOptions = [
     'Admin',
@@ -45,6 +46,8 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
 
     selectedRoleKaryawan = widget.documentUsers['role'] ?? roleOptions[3];
     _profileImageUrl = widget.documentUsers['profile_picture'];
+
+    _checkAdminRole();
   }
 
   @override
@@ -87,9 +90,30 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
                   buildTextField(
                       'Email Karyawan', emailKaryawan, setWidth, false),
                   buildDropdown(setWidth, isEditMode),
-                  buildButton(isEditMode ? 'Save' : 'Edit', Colors.orange,
-                      _toggleEditMode)
+                  if (isAdmin)
+                    Row(children: [
+                      buildButton(isEditMode ? 'Save' : 'Edit', Colors.orange,
+                          _toggleEditMode),
+                      buildButton('Reset Pass', Colors.blue, _changePassword)
+                    ])
                 ]))));
+  }
+
+  Future<void> _checkAdminRole() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('data_karyawan')
+          .doc(currentUser.uid)
+          .get();
+
+      if (userDoc.exists && userDoc['role'] == 'Admin') {
+        setState(() {
+          isAdmin = true;
+        });
+      }
+    }
   }
 
   Widget buildTextField(String label, TextEditingController controller,
@@ -143,7 +167,7 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
         margin: EdgeInsets.all(20),
         padding: EdgeInsets.symmetric(horizontal: 8),
         height: 50,
-        width: 150,
+        width: 130,
         decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -213,5 +237,22 @@ class _DetailsDataKaryawanPageState extends State<DetailsDataKaryawanPage> {
     await uploadTask.whenComplete(() => null);
     String downloadUrl = await storageReference.getDownloadURL();
     return downloadUrl;
+  }
+
+  Future<void> _changePassword() async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+          email: widget.documentUsers['email_karyawan']);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              'Password reset email sent to ${widget.documentUsers['email_karyawan']}'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 4)));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to send password reset email: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4)));
+    }
   }
 }

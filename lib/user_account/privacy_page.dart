@@ -19,7 +19,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
   bool _isObsure = true;
 
   Future<void> _updatePassword() async {
-    String newPassword = hashPassword(_passwordController.text.trim());
+    String newPassword = _passwordController.text.trim();
     if (newPassword.isNotEmpty) {
       try {
         User? user = FirebaseAuth.instance.currentUser;
@@ -35,7 +35,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
             await FirebaseFirestore.instance
                 .collection('admin')
                 .doc(user.uid)
-                .update({'password': newPassword});
+                .set({'password': newPassword});
           }
 
           await FirebaseFirestore.instance
@@ -184,12 +184,6 @@ class _PrivacyPageState extends State<PrivacyPage> {
     }
   }
 
-  String hashPassword(String password) {
-    final bytes = utf8.encode(password);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,16 +195,16 @@ class _PrivacyPageState extends State<PrivacyPage> {
               TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                      labelText: 'Change Email', border: OutlineInputBorder())),
+                      labelText: 'Email Baru', border: OutlineInputBorder())),
               SizedBox(height: 10),
               ElevatedButton(
-                  onPressed: _updateEmail, child: Text('Update Email')),
+                  onPressed: _updateEmail, child: Text('Ganti Email')),
               SizedBox(height: 30),
               TextField(
                   controller: _passwordController,
                   obscureText: _isObsure,
                   decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: 'Password Baru',
                       border: OutlineInputBorder(),
                       suffixIcon: IconButton(
                           icon: Icon(
@@ -232,7 +226,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
               SizedBox(height: 15),
               ElevatedButton(
                   onPressed: () => showDeleteConfirmationDialog(context),
-                  child: Text('Delete Account'))
+                  child: Text('Hapus Akun'))
             ])));
   }
 }

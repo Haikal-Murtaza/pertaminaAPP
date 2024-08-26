@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 
 class KaryawanAttandeeData extends StatefulWidget {
   final DocumentSnapshot documentUsers;
+  final DocumentSnapshot userData;
 
-  const KaryawanAttandeeData({required this.documentUsers});
+  const KaryawanAttandeeData(
+      {required this.documentUsers, required this.userData});
+
   @override
   _KaryawanAttandeeData createState() => _KaryawanAttandeeData();
 }
@@ -36,33 +39,14 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
     4: 'Cuti',
   };
 
+  late bool isAdmin;
+
   @override
   void initState() {
     super.initState();
     selectedStaffUid = widget.documentUsers.id;
+    isAdmin = widget.userData['role'] == 'Admin';
     fetchAttendanceData();
-  }
-
-  Future<void> fetchAttendanceData() async {
-    try {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('attendance')
-          .doc(selectedStaffUid)
-          .get();
-
-      if (doc.exists && doc.data() != null) {
-        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-        List<int>? days = List<int>.from(data?[selectedMonth] ?? []);
-        setState(() {
-          attendanceDays =
-              days.length == 31 ? days : List.generate(31, (index) => 0);
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Error fetching attendance: $e'),
-          backgroundColor: Colors.red));
-    }
   }
 
   @override
@@ -95,7 +79,9 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
                       itemCount: attendanceDays.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
-                            onTap: () => _selectStatus(context, index),
+                            onTap: isAdmin
+                                ? () => _selectStatus(context, index)
+                                : null,
                             child: Container(
                                 margin: EdgeInsets.all(4.0),
                                 decoration: BoxDecoration(
@@ -115,8 +101,10 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
                   child: Text("Kode Warna:", style: TextStyle(fontSize: 13))),
               _buildLegend(),
               SizedBox(height: 16.0),
-              ElevatedButton(
-                  onPressed: saveAttendance, child: Text('Save Attendance'))
+              isAdmin
+                  ? ElevatedButton(
+                      onPressed: saveAttendance, child: Text('Save Attendance'))
+                  : Container()
             ])));
   }
 
@@ -141,7 +129,46 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
                 style: TextStyle(color: Colors.white, fontSize: 10))));
   }
 
+  Future<void> fetchAttendanceData() async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('attendance')
+          .doc(selectedStaffUid)
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+        List<int> days =
+            List.generate(31, (index) => 0); // Initialize all days to 0
+
+        if (data != null && data[selectedMonth] != null) {
+          // Extract the attendance data for the selected month
+          Map<String, int> monthData =
+              Map<String, int>.from(data[selectedMonth]);
+
+          // Populate the attendanceDays list with the available data
+          monthData.forEach((key, value) {
+            int day = int.parse(key) - 1; // Convert day string to index
+            if (day >= 0 && day < 31) {
+              days[day] = value;
+            }
+          });
+        }
+
+        setState(() {
+          attendanceDays = days;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error fetching attendance: $e'),
+          backgroundColor: Colors.red));
+    }
+  }
+
   Future<void> _selectStatus(BuildContext context, int index) async {
+    if (!isAdmin) return; // Prevent selection if not Admin
+
     final selectedStatus = await showDialog<int>(
       context: context,
       builder: (BuildContext context) {
@@ -189,11 +216,19 @@ class _KaryawanAttandeeData extends State<KaryawanAttandeeData> {
     }
 
     try {
+      Map<String, int> attendanceToSave = {};
+
+      for (int i = 0; i < attendanceDays.length; i++) {
+        if (attendanceDays[i] != 0) {
+          attendanceToSave[(i + 1).toString()] = attendanceDays[i];
+        }
+      }
+
       await FirebaseFirestore.instance
           .collection('attendance')
           .doc(selectedStaffUid)
           .set({
-        selectedMonth: attendanceDays,
+        selectedMonth: attendanceToSave,
       }, SetOptions(merge: true));
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

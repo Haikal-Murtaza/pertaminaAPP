@@ -29,6 +29,8 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
 
   @override
   Widget build(BuildContext context) {
+    bool isAdmin = widget.userData['role'] == 'Admin';
+
     return Container(
         margin: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
         height: 170,
@@ -55,31 +57,32 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                  onTap: () {
-                                    if (_currentUser != null &&
-                                        _currentUser!.email !=
-                                            widget.documentUsers[
-                                                'email_karyawan']) {
-                                      showDeleteConfirmationDialog(
-                                          context, widget.documentUsers);
-                                    } else {
-                                      showCannotDeleteCurrentUserNotification(
-                                          context);
-                                    }
-                                  },
-                                  child: Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color: Colors.orange.shade700,
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10),
-                                              bottomRight:
-                                                  Radius.circular(10))),
-                                      child: Icon(Icons.delete_outline,
-                                          color: Colors.white))),
+                              if (isAdmin)
+                                GestureDetector(
+                                    onTap: () {
+                                      if (_currentUser != null &&
+                                          _currentUser!.email !=
+                                              widget.documentUsers[
+                                                  'email_karyawan']) {
+                                        showDeleteConfirmationDialog(
+                                            context, widget.documentUsers);
+                                      } else {
+                                        showCannotDeleteCurrentUserNotification(
+                                            context);
+                                      }
+                                    },
+                                    child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                            color: Colors.orange.shade700,
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(10),
+                                                topRight: Radius.circular(10),
+                                                bottomRight:
+                                                    Radius.circular(10))),
+                                        child: Icon(Icons.delete_outline,
+                                            color: Colors.white))),
                               SizedBox(width: 10),
                               GestureDetector(
                                   onTap: () {
@@ -101,8 +104,8 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
                               SizedBox(width: 10),
                               GestureDetector(
                                   onTap: () {
-                                    navToAttendeeData(
-                                        context, widget.documentUsers);
+                                    navToAttendeeData(context,
+                                        widget.documentUsers, widget.userData);
                                   },
                                   child: Container(
                                       height: 30,
@@ -180,6 +183,12 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
     try {
       String email = documentUsers['email_karyawan'];
       String userPassword = documentUsers['password'];
+      String userRole = documentUsers['role'];
+
+      await FirebaseFirestore.instance
+          .collection('attendance')
+          .doc(documentUsers.id)
+          .delete();
 
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: userPassword);
@@ -193,8 +202,14 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
         }
 
         await documentUsers.reference.delete();
-
         await userToDelete.delete();
+
+        if (userRole == 'Admin') {
+          await FirebaseFirestore.instance
+              .collection('admin')
+              .doc(documentUsers.id)
+              .delete();
+        }
       }
 
       if (currentUser != null) {
@@ -203,10 +218,12 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
             .doc(currentUser.uid)
             .get();
 
-        String adminPassword = adminDoc['password'];
+        String? adminPassword = adminDoc['password'];
 
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: currentUser.email!, password: adminPassword);
+        if (adminPassword != null) {
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: currentUser.email!, password: adminPassword);
+        }
       }
     } catch (e) {
       print("Error deleting user: $e");
@@ -217,11 +234,12 @@ class _KaryawanListItemState extends State<KaryawanListItem> {
             .doc(currentUser.uid)
             .get();
 
-        String adminPassword = adminDoc['password'];
+        String? adminPassword = adminDoc['password'];
 
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: currentUser.email!, password: adminPassword);
-        print("Error mengkonfirmasi Admin");
+        if (adminPassword != null) {
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: currentUser.email!, password: adminPassword);
+        }
       }
     }
   }

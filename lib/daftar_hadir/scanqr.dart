@@ -30,40 +30,33 @@ class QRScanPage extends StatelessWidget {
       }, SetOptions(merge: true));
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Attendance updated successfully.'),
-        backgroundColor: Colors.green,
-      ));
+          content: Text('Berhasil mendaftarkan absensi!'),
+          backgroundColor: Colors.green));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Invalid or outdated QR code.'),
-        backgroundColor: Colors.red,
-      ));
+          content: Text('Invalid QR code.'), backgroundColor: Colors.red));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Scan QR Code'),
-        backgroundColor: Colors.red,
-      ),
-      body: MobileScanner(
-        controller: cameraController,
-        onDetect: (capture) async {
-          final List<Barcode> barcodes = capture.barcodes;
-          for (final barcode in barcodes) {
-            final String? code = barcode.rawValue;
-            if (code != null) {
-              await updateAttendanceStatus(context, userId, code);
-              await Future.delayed(Duration(milliseconds: 300));
-              if (context.mounted) {
-                Navigator.of(context).pop();
+        appBar:
+            AppBar(title: Text('Scan QR Code'), backgroundColor: Colors.red),
+        body: MobileScanner(
+            controller: cameraController,
+            onDetect: (capture) async {
+              final List<Barcode> barcodes = capture.barcodes;
+              for (final barcode in barcodes) {
+                final String? code = barcode.rawValue;
+                if (code != null) {
+                  await updateAttendanceStatus(context, userId, code);
+                  await Future.delayed(Duration(milliseconds: 300));
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                }
               }
-            }
-          }
-        },
-      ),
-    );
+            }));
   }
 }
